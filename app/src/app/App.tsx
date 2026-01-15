@@ -1,27 +1,25 @@
-'use client';
-
 import { useState } from 'react';
-import { LoginScreen } from './src/app/components/LoginScreen';
-import { Sidebar, type NavigationPage } from './src/app/components/Sidebar';
-import { Dashboard } from './src/app/components/Dashboard';
-import { InventoryManagement } from './src/app/components/InventoryManagement';
-import { ItemsManagement } from './src/app/components/ItemsManagement';
-import { PurchaseModule } from './src/app/components/PurchaseModule';
-import { SalesModule } from './src/app/components/SalesModule';
-import { ProductionBOM } from './src/app/components/ProductionBOM';
-import { ProductionManagement } from './src/app/components/ProductionManagement';
-import { WorkOrders } from './src/app/components/WorkOrders';
-import { RepairMaintenance } from './src/app/components/RepairMaintenance';
-import { CustomerManagement } from './src/app/components/CustomerManagement';
-import { SupplierManagement } from './src/app/components/SupplierManagement';
-import { AccountingModule } from './src/app/components/AccountingModule';
-import { ReportsScreen } from './src/app/components/ReportsScreen';
-import { FinancialReports } from './src/app/components/FinancialReports';
-import { VATModule } from './src/app/components/VATModule';
-import { SettingsScreen } from './src/app/components/SettingsScreen';
-import { Toaster } from './src/app/components/ui/sonner';
+import { LoginScreen } from './components/LoginScreen';
+import { Sidebar, type NavigationPage } from './components/Sidebar';
+import { Dashboard } from './components/Dashboard';
+import { InventoryManagement } from './components/InventoryManagement';
+import { ItemsManagement } from './components/ItemsManagement';
+import { PurchaseModule } from './components/PurchaseModule';
+import { SalesModule } from './components/SalesModule';
+import { ProductionBOM } from './components/ProductionBOM';
+import { ProductionManagement } from './components/ProductionManagement';
+import { WorkOrders } from './components/WorkOrders';
+import { RepairMaintenance } from './components/RepairMaintenance';
+import { CustomerManagement } from './components/CustomerManagement';
+import { SupplierManagement } from './components/SupplierManagement';
+import { AccountingModule } from './components/AccountingModule';
+import { ReportsScreen } from './components/ReportsScreen';
+import { FinancialReports } from './components/FinancialReports';
+import { VATModule } from './components/VATModule';
+import { SettingsScreen } from './components/SettingsScreen';
+import { Toaster } from './components/ui/sonner';
 
-export default function Home() {
+export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('dashboard');
 

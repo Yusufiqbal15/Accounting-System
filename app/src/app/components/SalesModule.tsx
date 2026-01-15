@@ -1,0 +1,371 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Plus, FileText, Search } from 'lucide-react';
+import { mockSales } from '../mockData';
+import type { PaymentStatus, Sale } from '../types';
+import { toast } from 'sonner';
+
+export function SalesModule() {
+  const [sales, setSales] = useState<Sale[]>(mockSales);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<PaymentStatus | 'all'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'sale' | 'repair'>('all');
+  const [showAddSale, setShowAddSale] = useState(false);
+  const [formData, setFormData] = useState({
+    customerName: '',
+    itemName: '',
+    quantity: '',
+    ratePerUnit: '',
+    saleType: 'sale' as 'sale' | 'repair'
+  });
+
+  const handleAddSale = () => {
+    if (!formData.customerName || !formData.itemName || !formData.quantity || !formData.ratePerUnit) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    const amount = parseFloat(formData.quantity) * parseFloat(formData.ratePerUnit);
+    const vat = amount * 0.05;
+    const total = amount + vat;
+
+    const newSale: Sale = {
+      id: `SALE${Date.now()}`,
+      invoiceNumber: `INV-${Date.now()}`,
+      customerId: `CUST-${Date.now()}`,
+      customerName: formData.customerName,
+      type: formData.saleType,
+      items: [
+        {
+          itemId: `ITEM-${Date.now()}`,
+          itemName: formData.itemName,
+          quantity: parseFloat(formData.quantity),
+          ratePerUnit: parseFloat(formData.ratePerUnit),
+          amount: amount
+        }
+      ],
+      subtotal: amount,
+      vatAmount: vat,
+      total: total,
+      paymentStatus: 'pending',
+      date: new Date().toISOString()
+    };
+
+    setSales([...sales, newSale]);
+    setFormData({ customerName: '', itemName: '', quantity: '', ratePerUnit: '', saleType: 'sale' });
+    setShowAddSale(false);
+    toast.success('Sale created successfully!');
+  };
+
+  const getPaymentBadge = (status: PaymentStatus) => {
+    switch (status) {
+      case 'paid':
+        return <Badge className="bg-green-600">Paid</Badge>;
+      case 'partial':
+        return <Badge className="bg-amber-500">Partial</Badge>;
+      case 'pending':
+        return <Badge className="bg-orange-500">Pending</Badge>;
+      case 'overdue':
+        return <Badge className="bg-red-500">Overdue</Badge>;
+    }
+  };
+
+  // Filter sales
+  const filteredSales = sales.filter(sale => {
+    const matchesSearch = sale.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         sale.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || sale.paymentStatus === filterStatus;
+    const matchesType = filterType === 'all' || sale.type === filterType;
+    return matchesSearch && matchesStatus && matchesType;
+  });
+
+  return (
+    <div className="p-8 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-semibold">Sales Module</h1>
+          <p className="text-muted-foreground mt-1">Manage sales and generate invoices</p>
+        </div>
+        <Dialog open={showAddSale} onOpenChange={setShowAddSale}>
+          <DialogTrigger asChild>
+            <Button className="bg-green-600 hover:bg-green-700">
+              <Plus className="h-4 w-4 mr-2" />
+              New Sale
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Create New Sale</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Customer Name *</Label>
+                  <Input
+                    placeholder="Enter customer name"
+                    value={formData.customerName}
+                    onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Sale Type *</Label>
+                  <Select value={formData.saleType} onValueChange={(val: any) => setFormData({ ...formData, saleType: val })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sale">Sale</SelectItem>
+                      <SelectItem value="repair">Repair</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Item Name *</Label>
+                <Input
+                  placeholder="Enter item name"
+                  value={formData.itemName}
+                  onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Quantity *</Label>
+                  <Input
+                    type="number"
+                    placeholder="Enter quantity"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Rate Per Unit (AED) *</Label>
+                  <Input
+                    type="number"
+                    placeholder="Enter rate"
+                    value={formData.ratePerUnit}
+                    onChange={(e) => setFormData({ ...formData, ratePerUnit: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end pt-4">
+                <Button variant="outline" onClick={() => setShowAddSale(false)}>Cancel</Button>
+                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddSale}>Create Sale</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-l-4 border-l-green-600">
+          <CardHeader>
+            <CardTitle className="text-sm">Total Sales (This Month)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold text-green-600">
+              AED {mockSales.reduce((sum, s) => sum + s.total, 0).toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-l-4 border-l-blue-900">
+          <CardHeader>
+            <CardTitle className="text-sm">VAT Collected (5%)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold">
+              AED {mockSales.reduce((sum, s) => sum + s.vatAmount, 0).toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-l-4 border-l-amber-500">
+          <CardHeader>
+            <CardTitle className="text-sm">Pending Payments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold">
+              AED {mockSales.filter(s => s.paymentStatus !== 'paid').reduce((sum, s) => sum + s.total, 0).toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Sales Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* Search and Filter */}
+          <div className="space-y-4 mb-6">
+            <div className="flex gap-4 flex-wrap">
+              <div className="flex-1 min-w-xs">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by customer or invoice..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Select value={filterType} onValueChange={(val: any) => setFilterType(val)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="sale">Sales</SelectItem>
+                  <SelectItem value="repair">Repairs</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterStatus} onValueChange={(val: any) => setFilterStatus(val)}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Payment Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="partial">Partial</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="overdue">Overdue</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice No.</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead className="text-right">Subtotal</TableHead>
+                <TableHead className="text-right">VAT (5%)</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+                <TableHead>Payment Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSales.length > 0 ? (
+                filteredSales.map((sale) => (
+                  <TableRow key={sale.id}>
+                    <TableCell className="font-medium">{sale.invoiceNumber}</TableCell>
+                    <TableCell>{new Date(sale.date).toLocaleDateString()}</TableCell>
+                    <TableCell>{sale.customerName}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">{sale.type}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">{sale.subtotal.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">{sale.vatAmount.toLocaleString()}</TableCell>
+                    <TableCell className="text-right font-semibold">{sale.total.toLocaleString()}</TableCell>
+                    <TableCell>{getPaymentBadge(sale.paymentStatus)}</TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm">
+                        <FileText className="h-4 w-4 mr-1" />
+                        View Invoice
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                    No sales found matching your search
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Sales Items Detail */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Recent Sales Details ({filteredSales.length})</h2>
+        {filteredSales.length > 0 ? (
+          filteredSales.map((sale) => (
+            <Card key={sale.id}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>{sale.invoiceNumber}</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">{sale.customerName}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-semibold text-green-600">AED {sale.total.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground">{new Date(sale.date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Item</TableHead>
+                      <TableHead className="text-right">Qty</TableHead>
+                      <TableHead className="text-right">Dimensions (cm)</TableHead>
+                      <TableHead className="text-right">Volume (m³)</TableHead>
+                      <TableHead className="text-right">Rate/Unit</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sale.items.map((item, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>{item.itemName}</TableCell>
+                        <TableCell className="text-right">{item.quantity}</TableCell>
+                        <TableCell className="text-right">
+                          {item.dimensions ? 
+                            `${item.dimensions.length} × ${item.dimensions.width} × ${item.dimensions.height}` 
+                            : '-'}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {item.volume ? item.volume.toFixed(4) : '-'}
+                        </TableCell>
+                        <TableCell className="text-right">{item.ratePerUnit.toLocaleString()}</TableCell>
+                        <TableCell className="text-right font-semibold">{item.amount.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow className="border-t-2">
+                      <TableCell colSpan={5} className="text-right font-semibold">Subtotal:</TableCell>
+                      <TableCell className="text-right font-semibold">AED {sale.subtotal.toLocaleString()}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-right">VAT (5%):</TableCell>
+                      <TableCell className="text-right">AED {sale.vatAmount.toLocaleString()}</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-green-50">
+                      <TableCell colSpan={5} className="text-right font-semibold text-lg">Total:</TableCell>
+                      <TableCell className="text-right font-semibold text-lg text-green-900">
+                        AED {sale.total.toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <Card>
+            <CardContent className="pt-6 text-center text-muted-foreground">
+              No sales found matching your search
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
