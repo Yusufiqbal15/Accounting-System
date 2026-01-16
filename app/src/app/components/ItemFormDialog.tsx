@@ -173,48 +173,50 @@ export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemForm
                 </div>
               </div>
 
-              {/* Dimensions */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-sm text-muted-foreground">Dimensions (cm)</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="length">Length (cm) *</Label>
-                    <Input
-                      id="length"
-                      type="number"
-                      step="0.1"
-                      value={formData.length}
-                      onChange={(e) => handleChange('length', e.target.value)}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="width">Width (cm) *</Label>
-                    <Input
-                      id="width"
-                      type="number"
-                      step="0.1"
-                      value={formData.width}
-                      onChange={(e) => handleChange('width', e.target.value)}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="height">Height (cm) *</Label>
-                    <Input
-                      id="height"
-                      type="number"
-                      step="0.1"
-                      value={formData.height}
-                      onChange={(e) => handleChange('height', e.target.value)}
-                      placeholder="0"
-                      required
-                    />
+              {/* Dimensions - Only for Wood and Ply */}
+              {(formData.type === 'wood' || formData.type === 'ply') && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm text-muted-foreground">Dimensions (cm)</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="length">Length (cm) {formData.type === 'wood' ? '*' : ''}</Label>
+                      <Input
+                        id="length"
+                        type="number"
+                        step="0.1"
+                        value={formData.length}
+                        onChange={(e) => handleChange('length', e.target.value)}
+                        placeholder="0"
+                        required={formData.type === 'wood'}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="width">Width (cm) {formData.type === 'wood' ? '*' : ''}</Label>
+                      <Input
+                        id="width"
+                        type="number"
+                        step="0.1"
+                        value={formData.width}
+                        onChange={(e) => handleChange('width', e.target.value)}
+                        placeholder="0"
+                        required={formData.type === 'wood'}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="height">Height (cm) {formData.type === 'wood' ? '*' : ''}</Label>
+                      <Input
+                        id="height"
+                        type="number"
+                        step="0.1"
+                        value={formData.height}
+                        onChange={(e) => handleChange('height', e.target.value)}
+                        placeholder="0"
+                        required={formData.type === 'wood'}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Quantity and Pricing */}
               <div className="space-y-4">

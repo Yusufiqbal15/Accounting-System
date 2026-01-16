@@ -30,15 +30,21 @@ export function InventoryManagement() {
   });
 
   const handleAddItem = () => {
-    if (!formData.name || !formData.length || !formData.width || !formData.height || !formData.quantity || !formData.costPerUnit) {
+    if (!formData.name || !formData.quantity || !formData.costPerUnit) {
       toast.error('Please fill in all required fields');
       return;
     }
 
+    // For wood items, dimensions are mandatory
+    if (formData.type === 'wood' && (!formData.length || !formData.width || !formData.height)) {
+      toast.error('Please provide dimensions for wood items');
+      return;
+    }
+
     const volume = calculateVolume(
-      parseFloat(formData.length),
-      parseFloat(formData.width),
-      parseFloat(formData.height),
+      parseFloat(formData.length) || 0,
+      parseFloat(formData.width) || 0,
+      parseFloat(formData.height) || 0,
       parseFloat(formData.quantity)
     );
 
@@ -47,9 +53,9 @@ export function InventoryManagement() {
       name: formData.name,
       category: selectedTab,
       type: formData.type as any,
-      length: parseFloat(formData.length),
-      width: parseFloat(formData.width),
-      height: parseFloat(formData.height),
+      length: parseFloat(formData.length) || 0,
+      width: parseFloat(formData.width) || 0,
+      height: parseFloat(formData.height) || 0,
       quantity: parseFloat(formData.quantity),
       volume: volume,
       costPerUnit: parseFloat(formData.costPerUnit),
@@ -146,38 +152,81 @@ export function InventoryManagement() {
                   </Select>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Dimensions (cm)</Label>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs">Length</Label>
-                    <Input
-                      type="number"
-                      placeholder="Length"
-                      value={formData.length}
-                      onChange={(e) => setFormData({ ...formData, length: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">Width</Label>
-                    <Input
-                      type="number"
-                      placeholder="Width"
-                      value={formData.width}
-                      onChange={(e) => setFormData({ ...formData, width: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">Height</Label>
-                    <Input
-                      type="number"
-                      placeholder="Height"
-                      value={formData.height}
-                      onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                    />
+
+              {/* Dimensions - Mandatory for Wood */}
+              {formData.type === 'wood' && (
+                <div className="space-y-2">
+                  <Label>Dimensions (cm) * - Required for Wood</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Length *</Label>
+                      <Input
+                        type="number"
+                        placeholder="Length"
+                        value={formData.length}
+                        onChange={(e) => setFormData({ ...formData, length: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Width *</Label>
+                      <Input
+                        type="number"
+                        placeholder="Width"
+                        value={formData.width}
+                        onChange={(e) => setFormData({ ...formData, width: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Height *</Label>
+                      <Input
+                        type="number"
+                        placeholder="Height"
+                        value={formData.height}
+                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Dimensions - Optional for Non-Wood */}
+              {formData.type !== 'wood' && (
+                <div className="space-y-2">
+                  <Label>Dimensions (cm) - Optional</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Length</Label>
+                      <Input
+                        type="number"
+                        placeholder="Length"
+                        value={formData.length}
+                        onChange={(e) => setFormData({ ...formData, length: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Width</Label>
+                      <Input
+                        type="number"
+                        placeholder="Width"
+                        value={formData.width}
+                        onChange={(e) => setFormData({ ...formData, width: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Height</Label>
+                      <Input
+                        type="number"
+                        placeholder="Height"
+                        value={formData.height}
+                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Quantity *</Label>
