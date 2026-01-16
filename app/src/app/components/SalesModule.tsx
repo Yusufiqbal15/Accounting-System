@@ -8,18 +8,20 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Plus, FileText, Search } from 'lucide-react';
-import { mockSales } from '../mockData';
-import type { PaymentStatus, Sale } from '../types';
+import { mockSales, mockInventory } from '../mockData';
+import type { PaymentStatus, Sale, InventoryItem } from '../types';
 import { toast } from 'sonner';
 
 export function SalesModule() {
   const [sales, setSales] = useState<Sale[]>(mockSales);
+  const [inventory, setInventory] = useState<InventoryItem[]>(mockInventory);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<PaymentStatus | 'all'>('all');
-  const [filterType, setFilterType] = useState<'all' | 'sale' | 'repair'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'sale' | 'repair' | 'return'>('all');
   const [showAddSale, setShowAddSale] = useState(false);
   const [formData, setFormData] = useState({
     customerName: '',
+    itemId: '',
     itemName: '',
     itemType: 'wood',
     quantity: '',
@@ -27,7 +29,7 @@ export function SalesModule() {
     width: '',
     height: '',
     ratePerUnit: '',
-    saleType: 'sale' as 'sale' | 'repair'
+    saleType: 'sale' as 'sale' | 'repair' | 'return'
   });
 
   const calculateVolume = () => {
@@ -38,9 +40,26 @@ export function SalesModule() {
     return (l * w * h * q) / 1000000;
   };
 
+  // Handle item selection from dropdown
+  const handleItemSelect = (itemId: string) => {
+    const selectedItem = inventory.find(item => item.id === itemId);
+    if (selectedItem) {
+      setFormData(prev => ({
+        ...prev,
+        itemId: selectedItem.id,
+        itemName: selectedItem.name,
+        itemType: selectedItem.type,
+        length: selectedItem.length.toString(),
+        width: selectedItem.width.toString(),
+        height: selectedItem.height.toString(),
+        ratePerUnit: selectedItem.costPerUnit.toString()
+      }));
+    }
+  };
+
   const handleAddSale = () => {
     // Validate required fields
-    if (!formData.customerName || !formData.itemName || !formData.quantity || !formData.ratePerUnit) {
+    if (!formData.customerName || !formData.itemId || !formData.quantity || !formData.ratePerUnit) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -49,6 +68,15 @@ export function SalesModule() {
     if (formData.itemType === 'wood' && (!formData.length || !formData.width || !formData.height)) {
       toast.error('Please provide dimensions for wood items');
       return;
+    }
+
+    // Check inventory quantity for sales (not for repairs or returns)
+    if (formData.saleType === 'sale') {
+      const inventoryItem = inventory.find(item => item.id === formData.itemId);
+      if (!inventoryItem || inventoryItem.quantity < parseFloat(formData.quantity)) {
+        toast.error('Insufficient inventory quantity');
+        return;
+      }
     }
 
     const amount = parseFloat(formData.quantity) * parseFloat(formData.ratePerUnit);
@@ -64,7 +92,7 @@ export function SalesModule() {
       type: formData.saleType,
       items: [
         {
-          itemId: `ITEM-${Date.now()}`,
+          itemId: formData.itemId,
           itemName: formData.itemName,
           quantity: parseFloat(formData.quantity),
           ...(formData.length || formData.width || formData.height ? {
@@ -86,9 +114,29 @@ export function SalesModule() {
       date: new Date().toISOString()
     };
 
+    // Update inventory based on transaction type
+    if (formData.saleType === 'sale') {
+      // Deduct from inventory on sale
+      setInventory(inventory.map(item => 
+        item.id === formData.itemId 
+          ? { ...item, quantity: item.quantity - parseFloat(formData.quantity) }
+          : item
+      ));
+      toast.success(`Inventory debited: ${formData.itemName} (Qty: ${formData.quantity})`);
+    } else if (formData.saleType === 'return') {
+      // Add back to inventory on return
+      setInventory(inventory.map(item => 
+        item.id === formData.itemId 
+          ? { ...item, quantity: item.quantity + parseFloat(formData.quantity) }
+          : item
+      ));
+      toast.success(`Inventory credited: ${formData.itemName} (Qty: ${formData.quantity})`);
+    }
+
     setSales([...sales, newSale]);
     setFormData({ 
       customerName: '', 
+      itemId: '',
       itemName: '', 
       itemType: 'wood',
       quantity: '', 
@@ -99,7 +147,7 @@ export function SalesModule() {
       saleType: 'sale' 
     });
     setShowAddSale(false);
-    toast.success('Sale created successfully!');
+    toast.success('Transaction recorded successfully!');
   };
 
   const getPaymentBadge = (status: PaymentStatus) => {
@@ -162,32 +210,31 @@ export function SalesModule() {
                     <SelectContent>
                       <SelectItem value="sale">Sale</SelectItem>
                       <SelectItem value="repair">Repair</SelectItem>
+                      <SelectItem value="return">Return</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label>Item Name *</Label>
-                <Input
-                  placeholder="Enter item name"
-                  value={formData.itemName}
-                  onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Item Type *</Label>
-                <Select value={formData.itemType} onValueChange={(val) => setFormData({ ...formData, itemType: val })}>
+                <Label>Select Item from Inventory *</Label>
+                <Select value={formData.itemId} onValueChange={handleItemSelect}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Choose an item..." />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="wood">Wood</SelectItem>
-                    <SelectItem value="ply">Ply</SelectItem>
-                    <SelectItem value="raw">Raw Material</SelectItem>
-                    <SelectItem value="spare_part">Spare Part</SelectItem>
-                    <SelectItem value="finished">Finished Good</SelectItem>
+                  <SelectContent className="max-h-60">
+                    {inventory.map(item => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name} (Qty: {item.quantity}, Type: {item.type})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {formData.itemId && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Selected: {formData.itemName}
+                  </p>
+                )}
               </div>
 
               {/* Dimensions - Mandatory for Wood */}
@@ -356,6 +403,7 @@ export function SalesModule() {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="sale">Sales</SelectItem>
                   <SelectItem value="repair">Repairs</SelectItem>
+                  <SelectItem value="return">Returns</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={filterStatus} onValueChange={(val: any) => setFilterStatus(val)}>

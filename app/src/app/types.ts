@@ -102,7 +102,7 @@ export interface Sale {
   invoiceNumber: string;
   customerId: string;
   customerName: string;
-  type: 'sale' | 'repair';
+  type: 'sale' | 'repair' | 'return';
   items: {
     itemId: string;
     itemName: string;
