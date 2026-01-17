@@ -8,22 +8,34 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Plus, FileText, Search, X } from 'lucide-react';
-import { mockSales, mockInventory, mockCustomers } from '../mockData';
+import { mockSales, mockInventory } from '../mockData';
 import type { PaymentStatus, Sale, InventoryItem, Customer } from '../types';
 import { toast } from 'sonner';
 
-export function SalesModule() {
+interface SalesModuleProps {
+  customers: Customer[];
+  setCustomers: (customers: Customer[]) => void;
+}
+
+export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
   const [sales, setSales] = useState<Sale[]>(mockSales);
   const [inventory, setInventory] = useState<InventoryItem[]>(mockInventory);
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<PaymentStatus | 'all'>('all');
   const [filterType, setFilterType] = useState<'all' | 'sale' | 'repair' | 'return'>('all');
   const [showAddSale, setShowAddSale] = useState(false);
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerSearchOpen, setCustomerSearchOpen] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
   const [itemSearchQuery, setItemSearchQuery] = useState('');
+  const [newCustomerData, setNewCustomerData] = useState({
+    name: '',
+    contact: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
   const [formData, setFormData] = useState({
     customerId: '',
     customerName: '',
@@ -70,6 +82,44 @@ export function SalesModule() {
     }));
     setCustomerSearchQuery('');
     setCustomerSearchOpen(false);
+  };
+
+  // Handle adding a new customer
+  const handleAddNewCustomer = () => {
+    if (!newCustomerData.name || !newCustomerData.contact || !newCustomerData.email || !newCustomerData.phone || !newCustomerData.address) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    const newCustomer: Customer = {
+      id: `CUST${Date.now()}`,
+      name: newCustomerData.name,
+      contact: newCustomerData.contact,
+      email: newCustomerData.email,
+      phone: newCustomerData.phone,
+      address: newCustomerData.address,
+      outstandingBalance: 0,
+      totalSales: 0,
+      totalRepairs: 0,
+      purchaseHistory: []
+    };
+
+    // Add new customer to list
+    setCustomers([...customers, newCustomer]);
+
+    // Auto-select the newly created customer
+    handleCustomerSelect(newCustomer);
+
+    // Reset form and close dialog
+    setNewCustomerData({
+      name: '',
+      contact: '',
+      email: '',
+      phone: '',
+      address: ''
+    });
+    setShowAddCustomer(false);
+    toast.success('New customer added successfully!');
   };
 
   // Handle item selection from dropdown
@@ -255,7 +305,69 @@ export function SalesModule() {
             <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto">
               {/* Customer Selection with Search */}
               <div className="space-y-2">
-                <Label>Select Customer * (CRM)</Label>
+                <div className="flex justify-between items-center mb-2">
+                  <Label>Select Customer * (CRM)</Label>
+                  <Dialog open={showAddCustomer} onOpenChange={setShowAddCustomer}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline" className="bg-amber-50 hover:bg-amber-100 text-amber-900">
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add Customer
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Add New Customer</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label>Customer Name *</Label>
+                          <Input
+                            placeholder="Enter customer name"
+                            value={newCustomerData.name}
+                            onChange={(e) => setNewCustomerData({ ...newCustomerData, name: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Contact Person Name *</Label>
+                          <Input
+                            placeholder="Enter contact person name"
+                            value={newCustomerData.contact}
+                            onChange={(e) => setNewCustomerData({ ...newCustomerData, contact: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Email *</Label>
+                          <Input
+                            type="email"
+                            placeholder="Enter email"
+                            value={newCustomerData.email}
+                            onChange={(e) => setNewCustomerData({ ...newCustomerData, email: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Phone Number *</Label>
+                          <Input
+                            placeholder="Enter phone number"
+                            value={newCustomerData.phone}
+                            onChange={(e) => setNewCustomerData({ ...newCustomerData, phone: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Address *</Label>
+                          <Input
+                            placeholder="Enter address"
+                            value={newCustomerData.address}
+                            onChange={(e) => setNewCustomerData({ ...newCustomerData, address: e.target.value })}
+                          />
+                        </div>
+                        <div className="flex gap-3 justify-end pt-4">
+                          <Button variant="outline" onClick={() => setShowAddCustomer(false)}>Cancel</Button>
+                          <Button className="bg-amber-600 hover:bg-amber-700" onClick={handleAddNewCustomer}>Add Customer</Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
                 <div className="relative">
                   {selectedCustomer ? (
                     <div className="border rounded-lg p-3 bg-blue-50 border-blue-300 space-y-2">

@@ -18,10 +18,13 @@ import { FinancialReports } from './components/FinancialReports';
 import { VATModule } from './components/VATModule';
 import { SettingsScreen } from './components/SettingsScreen';
 import { Toaster } from './components/ui/sonner';
+import { mockCustomers } from './mockData';
+import type { Customer } from './types';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('dashboard');
+  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
@@ -38,7 +41,7 @@ export default function App() {
       case 'purchases':
         return <PurchaseModule />;
       case 'sales':
-        return <SalesModule />;
+        return <SalesModule customers={customers} setCustomers={setCustomers} />;
       case 'production':
         return <ProductionBOM />;
       case 'production-mgmt':
@@ -48,7 +51,7 @@ export default function App() {
       case 'repairs':
         return <RepairMaintenance />;
       case 'customers':
-        return <CustomerManagement />;
+        return <CustomerManagement customers={customers} setCustomers={setCustomers} />;
       case 'suppliers':
         return <SupplierManagement />;
       case 'accounting':

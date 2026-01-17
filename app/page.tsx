@@ -20,10 +20,13 @@ import { FinancialReports } from './src/app/components/FinancialReports';
 import { VATModule } from './src/app/components/VATModule';
 import { SettingsScreen } from './src/app/components/SettingsScreen';
 import { Toaster } from './src/app/components/ui/sonner';
+import { mockCustomers } from './src/app/mockData';
+import type { Customer } from './src/app/types';
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('dashboard');
+  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
@@ -40,7 +43,7 @@ export default function Home() {
       case 'purchases':
         return <PurchaseModule />;
       case 'sales':
-        return <SalesModule />;
+        return <SalesModule customers={customers} setCustomers={setCustomers} />;
       case 'production':
         return <ProductionBOM />;
       case 'production-mgmt':
@@ -50,7 +53,7 @@ export default function Home() {
       case 'repairs':
         return <RepairMaintenance />;
       case 'customers':
-        return <CustomerManagement />;
+        return <CustomerManagement customers={customers} setCustomers={setCustomers} />;
       case 'suppliers':
         return <SupplierManagement />;
       case 'accounting':

@@ -8,12 +8,15 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Plus, Mail, Phone, MapPin, TrendingUp, Wrench, Search, Trash2 } from 'lucide-react';
-import { mockCustomers } from '../mockData';
 import type { Customer } from '../types';
 import { toast } from 'sonner';
 
-export function CustomerManagement() {
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+interface CustomerManagementProps {
+  customers: Customer[];
+  setCustomers: (customers: Customer[]) => void;
+}
+
+export function CustomerManagement({ customers, setCustomers }: CustomerManagementProps) {
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'outstanding' | 'clear'>('all');
