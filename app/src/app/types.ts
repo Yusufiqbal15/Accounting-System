@@ -52,7 +52,6 @@ export interface Customer {
     type: 'sale' | 'repair' | 'return';
   }>;
 }
-}
 
 export interface Purchase {
   id: string;
