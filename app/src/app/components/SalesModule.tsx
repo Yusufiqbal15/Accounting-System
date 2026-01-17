@@ -7,19 +7,25 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, FileText, Search } from 'lucide-react';
-import { mockSales, mockInventory } from '../mockData';
-import type { PaymentStatus, Sale, InventoryItem } from '../types';
+import { Plus, FileText, Search, X } from 'lucide-react';
+import { mockSales, mockInventory, mockCustomers } from '../mockData';
+import type { PaymentStatus, Sale, InventoryItem, Customer } from '../types';
 import { toast } from 'sonner';
 
 export function SalesModule() {
   const [sales, setSales] = useState<Sale[]>(mockSales);
   const [inventory, setInventory] = useState<InventoryItem[]>(mockInventory);
+  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<PaymentStatus | 'all'>('all');
   const [filterType, setFilterType] = useState<'all' | 'sale' | 'repair' | 'return'>('all');
   const [showAddSale, setShowAddSale] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customerSearchOpen, setCustomerSearchOpen] = useState(false);
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  const [itemSearchQuery, setItemSearchQuery] = useState('');
   const [formData, setFormData] = useState({
+    customerId: '',
     customerName: '',
     itemId: '',
     itemName: '',
@@ -40,6 +46,32 @@ export function SalesModule() {
     return (l * w * h * q) / 1000000;
   };
 
+  // Filter customers based on search
+  const filteredCustomers = customers.filter(customer =>
+    customer.name.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+    customer.contact.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+    customer.email.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+    customer.phone.includes(customerSearchQuery)
+  );
+
+  // Filter items based on search
+  const filteredItems = inventory.filter(item =>
+    item.name.toLowerCase().includes(itemSearchQuery.toLowerCase()) &&
+    item.quantity > 0
+  );
+
+  // Handle customer selection
+  const handleCustomerSelect = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setFormData(prev => ({
+      ...prev,
+      customerId: customer.id,
+      customerName: customer.name
+    }));
+    setCustomerSearchQuery('');
+    setCustomerSearchOpen(false);
+  };
+
   // Handle item selection from dropdown
   const handleItemSelect = (itemId: string) => {
     const selectedItem = inventory.find(item => item.id === itemId);
@@ -54,12 +86,13 @@ export function SalesModule() {
         height: selectedItem.height.toString(),
         ratePerUnit: selectedItem.costPerUnit.toString()
       }));
+      setItemSearchQuery('');
     }
   };
 
   const handleAddSale = () => {
     // Validate required fields
-    if (!formData.customerName || !formData.itemId || !formData.quantity || !formData.ratePerUnit) {
+    if (!formData.customerId || !formData.itemId || !formData.quantity || !formData.ratePerUnit) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -87,7 +120,7 @@ export function SalesModule() {
     const newSale: Sale = {
       id: `SALE${Date.now()}`,
       invoiceNumber: `INV-${Date.now()}`,
-      customerId: `CUST-${Date.now()}`,
+      customerId: formData.customerId,
       customerName: formData.customerName,
       type: formData.saleType,
       items: [
@@ -122,7 +155,6 @@ export function SalesModule() {
           ? { ...item, quantity: item.quantity - parseFloat(formData.quantity) }
           : item
       ));
-      toast.success(`Inventory debited: ${formData.itemName} (Qty: ${formData.quantity})`);
     } else if (formData.saleType === 'return') {
       // Add back to inventory on return
       setInventory(inventory.map(item => 
@@ -130,11 +162,40 @@ export function SalesModule() {
           ? { ...item, quantity: item.quantity + parseFloat(formData.quantity) }
           : item
       ));
-      toast.success(`Inventory credited: ${formData.itemName} (Qty: ${formData.quantity})`);
     }
 
+    // Update customer purchase history and totals
+    setCustomers(customers.map(customer => {
+      if (customer.id === formData.customerId) {
+        const updatedHistory = customer.purchaseHistory || [];
+        updatedHistory.push({
+          invoiceNumber: newSale.invoiceNumber,
+          itemName: formData.itemName,
+          quantity: parseFloat(formData.quantity),
+          amount: amount,
+          date: newSale.date,
+          type: formData.saleType
+        });
+        
+        return {
+          ...customer,
+          totalSales: customer.totalSales + amount,
+          totalRepairs: formData.saleType === 'repair' ? customer.totalRepairs + 1 : customer.totalRepairs,
+          outstandingBalance: formData.saleType === 'return' 
+            ? customer.outstandingBalance - amount 
+            : customer.outstandingBalance + amount,
+          purchaseHistory: updatedHistory
+        };
+      }
+      return customer;
+    }));
+
     setSales([...sales, newSale]);
+    
+    // Reset form
+    setSelectedCustomer(null);
     setFormData({ 
+      customerId: '',
       customerName: '', 
       itemId: '',
       itemName: '', 
@@ -147,7 +208,7 @@ export function SalesModule() {
       saleType: 'sale' 
     });
     setShowAddSale(false);
-    toast.success('Transaction recorded successfully!');
+    toast.success('Transaction recorded and customer updated!');
   };
 
   const getPaymentBadge = (status: PaymentStatus) => {
@@ -191,16 +252,94 @@ export function SalesModule() {
             <DialogHeader>
               <DialogTitle>Create New Sale</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Customer Name *</Label>
-                  <Input
-                    placeholder="Enter customer name"
-                    value={formData.customerName}
-                    onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                  />
+            <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto">
+              {/* Customer Selection with Search */}
+              <div className="space-y-2">
+                <Label>Select Customer * (CRM)</Label>
+                <div className="relative">
+                  {selectedCustomer ? (
+                    <div className="border rounded-lg p-3 bg-blue-50 border-blue-300 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="font-semibold text-blue-900">{selectedCustomer.name}</p>
+                          <p className="text-xs text-muted-foreground">{selectedCustomer.email}</p>
+                          <p className="text-xs text-muted-foreground">{selectedCustomer.phone}</p>
+                          <p className="text-xs text-muted-foreground">{selectedCustomer.address}</p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedCustomer(null);
+                            setFormData(prev => ({ ...prev, customerId: '', customerName: '' }));
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 text-xs gap-2">
+                        <div className="bg-white p-2 rounded">
+                          <span className="text-muted-foreground">Total Sales:</span>
+                          <p className="font-semibold">AED {selectedCustomer.totalSales.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white p-2 rounded">
+                          <span className="text-muted-foreground">Outstanding:</span>
+                          <p className="font-semibold text-red-600">AED {selectedCustomer.outstandingBalance.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Purchase History */}
+                      {selectedCustomer.purchaseHistory && selectedCustomer.purchaseHistory.length > 0 && (
+                        <div className="bg-white p-2 rounded text-xs">
+                          <p className="font-semibold mb-1">Recent Purchases:</p>
+                          <div className="space-y-1 max-h-24 overflow-y-auto">
+                            {selectedCustomer.purchaseHistory.slice(-3).reverse().map((purchase, idx) => (
+                              <div key={idx} className="flex justify-between text-xs">
+                                <span>{purchase.itemName} (Qty: {purchase.quantity})</span>
+                                <span className="text-muted-foreground">{new Date(purchase.date).toLocaleDateString()}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <Input
+                        placeholder="Search customer by name, email, or phone..."
+                        value={customerSearchQuery}
+                        onChange={(e) => {
+                          setCustomerSearchQuery(e.target.value);
+                          setCustomerSearchOpen(true);
+                        }}
+                        onFocus={() => setCustomerSearchOpen(true)}
+                      />
+                      {customerSearchOpen && (
+                        <div className="absolute top-full left-0 right-0 border rounded-lg bg-white shadow-lg z-50 max-h-48 overflow-y-auto">
+                          {filteredCustomers.length > 0 ? (
+                            filteredCustomers.map(customer => (
+                              <button
+                                key={customer.id}
+                                className="w-full text-left px-4 py-3 hover:bg-gray-100 border-b last:border-b-0"
+                                onClick={() => handleCustomerSelect(customer)}
+                              >
+                                <div className="font-semibold text-sm">{customer.name}</div>
+                                <div className="text-xs text-muted-foreground">{customer.email} | {customer.phone}</div>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-3 text-center text-sm text-muted-foreground">
+                              No customers found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Sale Type *</Label>
                   <Select value={formData.saleType} onValueChange={(val: any) => setFormData({ ...formData, saleType: val })}>
@@ -216,24 +355,47 @@ export function SalesModule() {
                 </div>
               </div>
 
+              {/* Item Selection with Search */}
               <div className="space-y-2">
-                <Label>Select Item from Inventory *</Label>
-                <Select value={formData.itemId} onValueChange={handleItemSelect}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose an item..." />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {inventory.map(item => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.name} (Qty: {item.quantity}, Type: {item.type})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Search & Select Item from Inventory *</Label>
+                <Input
+                  placeholder="Search instrument (e.g., Guitar, Drum...)"
+                  value={itemSearchQuery}
+                  onChange={(e) => setItemSearchQuery(e.target.value)}
+                  className="mb-2"
+                />
+                
+                {itemSearchQuery && (
+                  <div className="border rounded-lg bg-white shadow-md max-h-48 overflow-y-auto">
+                    {filteredItems.length > 0 ? (
+                      filteredItems.map(item => (
+                        <button
+                          key={item.id}
+                          className="w-full text-left px-4 py-3 hover:bg-gray-100 border-b last:border-b-0"
+                          onClick={() => handleItemSelect(item.id)}
+                        >
+                          <div className="font-semibold text-sm">{item.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Type: {item.type} | Available: {item.quantity} | Cost: AED {item.costPerUnit}
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-center text-sm text-muted-foreground">
+                        No items found
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {formData.itemId && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Selected: {formData.itemName}
-                  </p>
+                  <div className="border rounded-lg p-3 bg-green-50 border-green-300">
+                    <p className="text-xs text-muted-foreground">Selected Item</p>
+                    <p className="font-semibold text-green-900">{formData.itemName}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Type: {formData.itemType} | Cost: AED {formData.ratePerUnit}
+                    </p>
+                  </div>
                 )}
               </div>
 

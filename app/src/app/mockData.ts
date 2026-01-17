@@ -147,7 +147,25 @@ export const mockCustomers: Customer[] = [
     address: 'Business Bay, Dubai, UAE',
     outstandingBalance: 18000,
     totalSales: 250000,
-    totalRepairs: 2
+    totalRepairs: 2,
+    purchaseHistory: [
+      {
+        invoiceNumber: 'INV-2026-001',
+        itemName: 'Teak Wood Plank',
+        quantity: 10,
+        amount: 4500,
+        date: '2026-01-10',
+        type: 'sale'
+      },
+      {
+        invoiceNumber: 'INV-2026-002',
+        itemName: 'Marine Plywood 18mm',
+        quantity: 5,
+        amount: 1400,
+        date: '2026-01-12',
+        type: 'sale'
+      }
+    ]
   },
   {
     id: 'CUST002',
@@ -158,7 +176,17 @@ export const mockCustomers: Customer[] = [
     address: 'Dubai Marina, UAE',
     outstandingBalance: 0,
     totalSales: 180000,
-    totalRepairs: 5
+    totalRepairs: 5,
+    purchaseHistory: [
+      {
+        invoiceNumber: 'INV-2026-003',
+        itemName: 'Oak Wood Sheet',
+        quantity: 8,
+        amount: 3040,
+        date: '2026-01-08',
+        type: 'sale'
+      }
+    ]
   },
   {
     id: 'CUST003',
@@ -169,7 +197,25 @@ export const mockCustomers: Customer[] = [
     address: 'Abu Dhabi, UAE',
     outstandingBalance: 42000,
     totalSales: 520000,
-    totalRepairs: 8
+    totalRepairs: 8,
+    purchaseHistory: [
+      {
+        invoiceNumber: 'INV-2026-004',
+        itemName: 'Custom Dining Table',
+        quantity: 2,
+        amount: 5000,
+        date: '2026-01-07',
+        type: 'sale'
+      },
+      {
+        invoiceNumber: 'INV-2026-005',
+        itemName: 'Office Desk - Premium',
+        quantity: 3,
+        amount: 8400,
+        date: '2026-01-09',
+        type: 'sale'
+      }
+    ]
   }
 ];
 

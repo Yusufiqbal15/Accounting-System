@@ -43,6 +43,15 @@ export interface Customer {
   outstandingBalance: number;
   totalSales: number;
   totalRepairs: number;
+  purchaseHistory?: Array<{
+    invoiceNumber: string;
+    itemName: string;
+    quantity: number;
+    amount: number;
+    date: string;
+    type: 'sale' | 'repair' | 'return';
+  }>;
+}
 }
 
 export interface Purchase {
