@@ -1,4 +1,7 @@
-import { useState } from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -14,10 +17,15 @@ import type { InventoryCategory, StockStatus, InventoryItem } from '../types';
 import { toast } from 'sonner';
 
 export function InventoryManagement() {
+  const { t, i18n } = useTranslation();
   const [inventory, setInventory] = useState<InventoryItem[]>(mockInventory);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTab, setSelectedTab] = useState<InventoryCategory>('raw_materials');
   const [showAddItem, setShowAddItem] = useState(false);
+
+  React.useEffect(() => {
+    // Force re-render when language changes
+  }, [i18n.language]);
   const [formData, setFormData] = useState({
     name: '',
     type: 'wood',
@@ -31,13 +39,13 @@ export function InventoryManagement() {
 
   const handleAddItem = () => {
     if (!formData.name || !formData.quantity || !formData.costPerUnit) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
     // For wood items, dimensions are mandatory
     if (formData.type === 'wood' && (!formData.length || !formData.width || !formData.height)) {
-      toast.error('Please provide dimensions for wood items');
+      toast.error(t('inventory.pleaseProvideDimensions'));
       return;
     }
 
@@ -74,17 +82,17 @@ export function InventoryManagement() {
       stockStatus: 'in_stock'
     });
     setShowAddItem(false);
-    toast.success('Inventory item added successfully!');
+    toast.success(t('inventory.itemAddedSuccessfully'));
   };
 
   const getStockBadge = (status: StockStatus) => {
     switch (status) {
       case 'in_stock':
-        return <Badge className="bg-green-600">In Stock</Badge>;
+        return <Badge className="bg-green-600">{t('inventoryModule.inStock')}</Badge>;
       case 'low_stock':
-        return <Badge className="bg-amber-500">Low Stock</Badge>;
+        return <Badge className="bg-amber-500">{t('inventoryModule.lowStock')}</Badge>;
       case 'out_of_stock':
-        return <Badge className="bg-red-500">Out of Stock</Badge>;
+        return <Badge className="bg-red-500">{t('common.noData')}</Badge>;
     }
   };
 
@@ -99,23 +107,23 @@ export function InventoryManagement() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Inventory Management</h1>
-          <p className="text-muted-foreground mt-1">Manage raw materials, finished goods, and trading items</p>
+          <h1 className="text-3xl font-semibold">{t('inventoryModule.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('inventoryModule.manageInventory')}</p>
         </div>
         <Dialog open={showAddItem} onOpenChange={setShowAddItem}>
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              Add New Item
+              {t('inventoryModule.addNewItem')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Inventory Item</DialogTitle>
+              <DialogTitle>{t('dialogs.addItem')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Item Name *</Label>
+                <Label>{t('inventoryModule.itemName')} *</Label>
                 <Input
                   placeholder="Enter item name"
                   value={formData.name}
@@ -124,7 +132,7 @@ export function InventoryManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Item Type</Label>
+                  <Label>{t('inventoryModule.type')}</Label>
                   <Select value={formData.type} onValueChange={(val) => setFormData({ ...formData, type: val })}>
                     <SelectTrigger>
                       <SelectValue />
@@ -139,15 +147,15 @@ export function InventoryManagement() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Stock Status</Label>
+                  <Label>{t('inventoryModule.status')}</Label>
                   <Select value={formData.stockStatus} onValueChange={(val: any) => setFormData({ ...formData, stockStatus: val })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="in_stock">In Stock</SelectItem>
-                      <SelectItem value="low_stock">Low Stock</SelectItem>
-                      <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                      <SelectItem value="in_stock">{t('inventoryModule.inStock')}</SelectItem>
+                      <SelectItem value="low_stock">{t('inventoryModule.lowStock')}</SelectItem>
+                      <SelectItem value="out_of_stock">{t('common.noData')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -248,8 +256,8 @@ export function InventoryManagement() {
                 </div>
               </div>
               <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowAddItem(false)}>Cancel</Button>
-                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddItem}>Add Item</Button>
+                <Button variant="outline" onClick={() => setShowAddItem(false)}>{t('common.cancel')}</Button>
+                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddItem}>{t('common.add')}</Button>
               </div>
             </div>
           </DialogContent>
@@ -260,9 +268,9 @@ export function InventoryManagement() {
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="pt-6">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-semibold text-blue-900">Auto-Calculation Formula:</span>
+            <span className="font-semibold text-blue-900">{t('inventoryModule.autoCalculation')}</span>
             <code className="bg-white px-3 py-1 rounded border border-blue-200 text-blue-900">
-              Volume (m³) = (Length × Width × Height × Quantity) ÷ 1,000,000
+              {t('inventoryModule.volumeFormula')}
             </code>
           </div>
         </CardContent>
@@ -273,7 +281,7 @@ export function InventoryManagement() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search inventory items..."
+            placeholder={t('inventoryModule.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -284,32 +292,32 @@ export function InventoryManagement() {
       {/* Inventory Tabs */}
       <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as InventoryCategory)}>
         <TabsList>
-          <TabsTrigger value="raw_materials">Raw Materials</TabsTrigger>
-          <TabsTrigger value="finished_goods">Finished Goods</TabsTrigger>
-          <TabsTrigger value="trading_items">Trading Items</TabsTrigger>
+          <TabsTrigger value="raw_materials">{t('inventoryModule.rawMaterials')}</TabsTrigger>
+          <TabsTrigger value="finished_goods">{t('inventoryModule.finishedGoods')}</TabsTrigger>
+          <TabsTrigger value="trading_items">{t('inventoryModule.tradingItems')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={selectedTab} className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>
-                {selectedTab === 'raw_materials' && 'Raw Materials'}
-                {selectedTab === 'finished_goods' && 'Finished Goods (Manufactured)'}
-                {selectedTab === 'trading_items' && 'Trading Items (Resale)'}
+                {selectedTab === 'raw_materials' && t('inventoryModule.rawMaterials')}
+                {selectedTab === 'finished_goods' && t('inventoryModule.finishedGoods')}
+                {selectedTab === 'trading_items' && t('inventoryModule.tradingItems')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Item Code</TableHead>
-                    <TableHead>Item Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-right">Length (cm)</TableHead>
-                    <TableHead className="text-right">Width (cm)</TableHead>
-                    <TableHead className="text-right">Height (cm)</TableHead>
-                    <TableHead className="text-right">Quantity</TableHead>
-                    <TableHead className="text-right bg-blue-50">Volume (m³)</TableHead>
+                    <TableHead>{t('inventoryModule.itemCode')}</TableHead>
+                    <TableHead>{t('inventoryModule.itemName')}</TableHead>
+                    <TableHead>{t('inventoryModule.type')}</TableHead>
+                    <TableHead className="text-right">{t('inventoryModule.length')}</TableHead>
+                    <TableHead className="text-right">{t('inventoryModule.width')}</TableHead>
+                    <TableHead className="text-right">{t('inventoryModule.height')}</TableHead>
+                    <TableHead className="text-right">{t('inventoryModule.quantity')}</TableHead>
+                    <TableHead className="text-right bg-blue-50">{t('inventoryModule.volume')}</TableHead>
                     <TableHead className="text-right">Cost/Unit (AED)</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
@@ -340,7 +348,7 @@ export function InventoryManagement() {
 
               {filteredInventory.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
-                  No items found in this category
+                  {t('common.noData')}
                 </div>
               )}
             </CardContent>
@@ -352,7 +360,7 @@ export function InventoryManagement() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Total Raw Materials</CardTitle>
+            <CardTitle className="text-sm">{t('inventoryModule.totalRawMaterials')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">
@@ -362,7 +370,7 @@ export function InventoryManagement() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Total Finished Goods</CardTitle>
+            <CardTitle className="text-sm">{t('inventoryModule.totalFinishedGoods')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">
@@ -372,7 +380,7 @@ export function InventoryManagement() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Total Trading Items</CardTitle>
+            <CardTitle className="text-sm">{t('inventoryModule.totalTradingItems')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">

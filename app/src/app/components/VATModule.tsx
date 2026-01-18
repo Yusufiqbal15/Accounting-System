@@ -1,3 +1,5 @@
+'use client';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -8,6 +10,7 @@ import { mockVATRecords } from '../mockData';
 import { useState } from 'react';
 
 export function VATModule() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const currentPeriod = mockVATRecords[mockVATRecords.length - 1];
   const totalSalesVAT = mockVATRecords.reduce((sum, v) => sum + v.salesVAT, 0);
@@ -17,11 +20,11 @@ export function VATModule() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'filed':
-        return <Badge className="bg-green-600">Filed</Badge>;
+        return <Badge className="bg-green-600">{t('vat.filed')}</Badge>;
       case 'paid':
-        return <Badge className="bg-blue-600">Paid</Badge>;
+        return <Badge className="bg-blue-600">{t('purchases.paid')}</Badge>;
       case 'pending':
-        return <Badge className="bg-amber-500">Pending</Badge>;
+        return <Badge className="bg-amber-500">{t('purchases.pending')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

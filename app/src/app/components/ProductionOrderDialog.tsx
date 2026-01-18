@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
@@ -15,6 +18,7 @@ interface ProductionOrderDialogProps {
 }
 
 export function ProductionOrderDialog({ open, onOpenChange }: ProductionOrderDialogProps) {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -82,7 +86,7 @@ export function ProductionOrderDialog({ open, onOpenChange }: ProductionOrderDia
     setIsLoading(false);
     setShowSuccess(true);
 
-    toast.success('Production order created successfully!');
+    toast.success(t('messages.productionOrderCreatedSuccessfully'));
 
     setTimeout(() => {
       setShowSuccess(false);

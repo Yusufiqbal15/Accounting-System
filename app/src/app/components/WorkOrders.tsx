@@ -1,4 +1,6 @@
+'use client';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -13,6 +15,7 @@ import type { WorkOrderStatus, WorkOrder } from '../types';
 import { toast } from 'sonner';
 
 export function WorkOrders() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<WorkOrderStatus | 'all'>('all');
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>(mockWorkOrders);
@@ -26,7 +29,7 @@ export function WorkOrders() {
 
   const handleAddWorkOrder = () => {
     if (!formData.productName || !formData.quantity || !formData.assignedTechnician || !formData.dueDate) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -45,7 +48,7 @@ export function WorkOrders() {
     setWorkOrders([...workOrders, newWO]);
     setFormData({ productName: '', quantity: '', assignedTechnician: '', dueDate: '' });
     setShowAddWO(false);
-    toast.success('Work order created successfully!');
+    toast.success(t('messages.workOrderCreatedSuccessfully'));
   };
 
   const getStatusBadge = (status: WorkOrderStatus) => {

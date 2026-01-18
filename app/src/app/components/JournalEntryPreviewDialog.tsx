@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -18,6 +21,7 @@ export function JournalEntryPreviewDialog({
   journalEntryId,
   productionOrder 
 }: JournalEntryPreviewDialogProps) {
+  const { t } = useTranslation();
   const journalEntry = journalEntryId ? mockJournalEntries.find(je => je.id === journalEntryId) : null;
 
   if (!journalEntry || !productionOrder) {

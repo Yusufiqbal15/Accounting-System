@@ -1,4 +1,6 @@
+'use client';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -12,6 +14,7 @@ import type { Supplier } from '../types';
 import { toast } from 'sonner';
 
 export function SupplierManagement() {
+  const { t } = useTranslation();
   const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
   const [showAddSupplier, setShowAddSupplier] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +29,7 @@ export function SupplierManagement() {
 
   const handleAddSupplier = () => {
     if (!formData.name || !formData.email || !formData.phone) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -44,12 +47,12 @@ export function SupplierManagement() {
     setSuppliers([...suppliers, newSupplier]);
     setFormData({ name: '', contact: '', email: '', phone: '', address: '' });
     setShowAddSupplier(false);
-    toast.success('Supplier added successfully!');
+    toast.success(t('suppliers.supplierAddedSuccessfully'));
   };
 
   const handleDeleteSupplier = (id: string) => {
     setSuppliers(suppliers.filter(s => s.id !== id));
-    toast.success('Supplier deleted successfully!');
+    toast.success(t('suppliers.supplierDeletedSuccessfully'));
   };
 
   // Filter suppliers
@@ -67,8 +70,8 @@ export function SupplierManagement() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Supplier Management</h1>
-          <p className="text-muted-foreground mt-1">Accounts payable and supplier relationships</p>
+          <h1 className="text-3xl font-semibold">{t('suppliers.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('suppliers.title')}</p>
         </div>
         <Dialog open={showAddSupplier} onOpenChange={setShowAddSupplier}>
           <DialogTrigger asChild>

@@ -1,3 +1,5 @@
+'use client';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -6,20 +8,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Settings, Building2, Users, Bell } from 'lucide-react';
 
 export function SettingsScreen() {
+  const { t } = useTranslation();
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center gap-3">
         <Settings className="h-8 w-8 text-blue-900" />
         <div>
-          <h1 className="text-3xl font-semibold">Settings</h1>
-          <p className="text-muted-foreground mt-1">System configuration and preferences</p>
+          <h1 className="text-3xl font-semibold">{t('settings.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('settings.title')}</p>
         </div>
       </div>
 
       <Tabs defaultValue="company">
         <TabsList>
-          <TabsTrigger value="company">Company Info</TabsTrigger>
-          <TabsTrigger value="users">Users & Roles</TabsTrigger>
+          <TabsTrigger value="company">{t('settings.company')}</TabsTrigger>
+          <TabsTrigger value="users">{t('settings.user')}</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 

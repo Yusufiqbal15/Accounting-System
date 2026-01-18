@@ -1,9 +1,12 @@
+'use client';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { useTranslation } from 'react-i18next';
 import { 
   Plus, 
   Package, 
@@ -16,13 +19,17 @@ import {
   Search
 } from 'lucide-react';
 import { mockProductionOrders, mockJournalEntries } from '../mockData';
-import { useState } from 'react';
 import { ProductionOrderDialog } from './ProductionOrderDialog';
 import { JournalEntryPreviewDialog } from './JournalEntryPreviewDialog';
 
 export function ProductionManagement() {
+  const { t, i18n } = useTranslation();
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
   const [journalPreviewOpen, setJournalPreviewOpen] = useState(false);
+
+  React.useEffect(() => {
+    // Force re-render when language changes
+  }, [i18n.language]);
   const [selectedOrder, setSelectedOrder] = useState<typeof mockProductionOrders[0] | null>(null);
   const [selectedJournalId, setSelectedJournalId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,11 +43,11 @@ export function ProductionManagement() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-600">Completed</Badge>;
+        return <Badge className="bg-green-600">{t('common.completed')}</Badge>;
       case 'wip':
-        return <Badge className="bg-blue-600">In Progress</Badge>;
+        return <Badge className="bg-blue-600">{t('productionManagement.inProgress')}</Badge>;
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>;
+        return <Badge variant="secondary">{t('productionManagement.pending')}</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -68,15 +75,15 @@ export function ProductionManagement() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Production Management</h1>
-          <p className="text-muted-foreground mt-1">Production orders with waste tracking & accounting integration</p>
+          <h1 className="text-3xl font-semibold">{t('productionManagement.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('productionManagement.subtitle')}</p>
         </div>
         <Button 
           className="bg-green-600 hover:bg-green-700"
           onClick={() => setOrderDialogOpen(true)}
         >
           <Plus className="h-4 w-4 mr-2" />
-          New Production Order
+          {t('productionManagement.newProductionOrder')}
         </Button>
       </div>
 
@@ -84,20 +91,20 @@ export function ProductionManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-blue-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Total Orders</CardTitle>
+            <CardTitle className="text-sm">{t('productionManagement.totalOrders')}</CardTitle>
             <Package className="h-5 w-5 text-blue-900" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{mockProductionOrders.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {mockProductionOrders.filter(o => o.status === 'completed').length} completed
+              {mockProductionOrders.filter(o => o.status === 'completed').length} {t('common.completed')}
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-green-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Production Value</CardTitle>
+            <CardTitle className="text-sm">{t('productionManagement.productionValue')}</CardTitle>
             <TrendingUp className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -109,7 +116,7 @@ export function ProductionManagement() {
 
         <Card className="border-l-4 border-l-red-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Total Wastage</CardTitle>
+            <CardTitle className="text-sm">{t('productionManagement.totalWastage')}</CardTitle>
             <AlertTriangle className="h-5 w-5 text-red-500" />
           </CardHeader>
           <CardContent>
@@ -117,14 +124,14 @@ export function ProductionManagement() {
               AED {totalWastage.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Avg {avgWastagePercentage.toFixed(1)}% of material cost
+              {t('productionManagement.avgWastage')} {avgWastagePercentage.toFixed(1)}% {t('productionManagement.ofMaterialCost')}
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-amber-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">High Wastage Alerts</CardTitle>
+            <CardTitle className="text-sm">{t('productionManagement.highWastageAlerts')}</CardTitle>
             <AlertTriangle className="h-5 w-5 text-amber-500" />
           </CardHeader>
           <CardContent>
@@ -132,7 +139,7 @@ export function ProductionManagement() {
               {highWastageOrders.length}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Orders exceeding 10% wastage
+              {t('productionManagement.ordersExceeding10Percent')}
             </p>
           </CardContent>
         </Card>
@@ -141,8 +148,8 @@ export function ProductionManagement() {
       {/* Tabs for Orders and Wastage Analysis */}
       <Tabs defaultValue="orders">
         <TabsList>
-          <TabsTrigger value="orders">Production Orders</TabsTrigger>
-          <TabsTrigger value="wastage">Wastage Analysis</TabsTrigger>
+          <TabsTrigger value="orders">{t('productionManagement.productionOrders')}</TabsTrigger>
+          <TabsTrigger value="wastage">{t('productionManagement.wastageAnalysis')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="orders" className="mt-6 space-y-6">
@@ -152,7 +159,7 @@ export function ProductionManagement() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by order ID or product name..."
+                  placeholder={t('productionManagement.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -177,12 +184,12 @@ export function ProductionManagement() {
                         {isHighWastage && (
                           <Badge variant="destructive" className="flex items-center gap-1">
                             <AlertTriangle className="h-3 w-3" />
-                            High Wastage
+                            {t('productionManagement.highWastage')}
                           </Badge>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Order ID: {order.id} | Quantity: {order.quantity} units
+                        {t('productionManagement.orderID')}: {order.id} | {t('productionManagement.quantity')}: {order.quantity} {t('common.units')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {new Date(order.startDate).toLocaleDateString()} - {new Date(order.completionDate).toLocaleDateString()}
@@ -201,17 +208,17 @@ export function ProductionManagement() {
                   <div>
                     <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                       <Package className="h-4 w-4" />
-                      Raw Materials & Wastage
+                      {t('productionManagement.rawMaterialsWastage')}
                     </h3>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Material</TableHead>
-                          <TableHead className="text-right">Used Qty</TableHead>
-                          <TableHead className="text-right">Wastage Qty</TableHead>
-                          <TableHead className="text-right">Wastage %</TableHead>
-                          <TableHead className="text-right">Wastage Value</TableHead>
-                          <TableHead className="text-right">Total Cost</TableHead>
+                          <TableHead>{t('productionManagement.material')}</TableHead>
+                          <TableHead className="text-right">{t('productionManagement.usedQty')}</TableHead>
+                          <TableHead className="text-right">{t('productionManagement.wastageQty')}</TableHead>
+                          <TableHead className="text-right">{t('productionManagement.wastagePercent')}</TableHead>
+                          <TableHead className="text-right">{t('productionManagement.wastageValue')}</TableHead>
+                          <TableHead className="text-right">{t('productionManagement.totalCost')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -260,7 +267,7 @@ export function ProductionManagement() {
                             <Package className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Material Cost</p>
+                            <p className="text-xs text-muted-foreground">{t('productionManagement.materialCost')}</p>
                             <p className="text-lg font-semibold">
                               AED {totalMaterialCost.toLocaleString()}
                             </p>
@@ -276,7 +283,7 @@ export function ProductionManagement() {
                             <AlertTriangle className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Wastage</p>
+                            <p className="text-xs text-muted-foreground">{t('productionManagement.wastage')}</p>
                             <p className="text-lg font-semibold text-red-600">
                               AED {order.totalWastageValue.toLocaleString()}
                             </p>
@@ -293,7 +300,7 @@ export function ProductionManagement() {
                             <Users className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Labor Cost</p>
+                            <p className="text-xs text-muted-foreground">{t('productionManagement.laborCost')}</p>
                             <p className="text-lg font-semibold">AED {order.laborCost.toLocaleString()}</p>
                           </div>
                         </div>
@@ -307,7 +314,7 @@ export function ProductionManagement() {
                             <Zap className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground">Overhead</p>
+                            <p className="text-xs text-muted-foreground">{t('productionManagement.overhead')}</p>
                             <p className="text-lg font-semibold">AED {order.overheadCost.toLocaleString()}</p>
                           </div>
                         </div>
@@ -317,7 +324,7 @@ export function ProductionManagement() {
                     <Card className="bg-blue-900 text-white">
                       <CardContent className="pt-6">
                         <div>
-                          <p className="text-xs opacity-80">Total Cost</p>
+                          <p className="text-xs opacity-80">{t('productionManagement.totalCost')}</p>
                           <p className="text-xl font-semibold mt-1">
                             AED {order.totalProductionCost.toLocaleString()}
                           </p>
@@ -329,7 +336,7 @@ export function ProductionManagement() {
                               onClick={() => handleViewJournal(order)}
                             >
                               <FileText className="h-3 w-3 mr-1" />
-                              View Journal
+                              {t('productionManagement.viewJournal')}
                             </Button>
                           )}
                         </div>
@@ -343,8 +350,8 @@ export function ProductionManagement() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-blue-900" />
-                          <span className="text-sm font-medium">Accounting Entry</span>
-                          <Badge variant="outline" className="text-xs">Auto-Posted</Badge>
+                          <span className="text-sm font-medium">{t('productionManagement.accountingEntry')}</span>
+                          <Badge variant="outline" className="text-xs">{t('productionManagement.autoPosted')}</Badge>
                         </div>
                         <Button
                           variant="outline"
@@ -352,11 +359,11 @@ export function ProductionManagement() {
                           onClick={() => handleViewJournal(order)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          View Journal Entry
+                          {t('productionManagement.viewJournalEntry')}
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2">
-                        Wastage of AED {order.totalWastageValue.toLocaleString()} posted to Production Waste/Scrap account
+                        {t('productionManagement.wastageLabel')} AED {order.totalWastageValue.toLocaleString()} {t('productionManagement.postedTo')}
                       </p>
                     </div>
                   )}
@@ -366,7 +373,7 @@ export function ProductionManagement() {
           }) : (
             <Card>
               <CardContent className="pt-6 text-center py-8 text-muted-foreground">
-                No production orders found matching your search
+                {t('common.noData')}
               </CardContent>
             </Card>
           )}
@@ -377,19 +384,19 @@ export function ProductionManagement() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-red-500" />
-                Wastage Analysis & Alerts
+                {t('productionManagement.wastageAnalysisAlerts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-right">Material Cost</TableHead>
-                    <TableHead className="text-right">Wastage Value</TableHead>
-                    <TableHead className="text-right">Wastage %</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead>{t('productionManagement.orderID')}</TableHead>
+                    <TableHead>{t('productionManagement.product')}</TableHead>
+                    <TableHead className="text-right">{t('productionManagement.materialCost')}</TableHead>
+                    <TableHead className="text-right">{t('productionManagement.wastageValue')}</TableHead>
+                    <TableHead className="text-right">{t('productionManagement.wastagePercent')}</TableHead>
+                    <TableHead className="text-center">{t('common.status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -415,11 +422,11 @@ export function ProductionManagement() {
                         </TableCell>
                         <TableCell className="text-center">
                           {isHighWastage ? (
-                            <Badge variant="destructive">High Wastage</Badge>
+                            <Badge variant="destructive">{t('productionManagement.highWastage')}</Badge>
                           ) : wastagePercentage > 5 ? (
-                            <Badge className="bg-amber-500">Moderate</Badge>
+                            <Badge className="bg-amber-500">{t('productionManagement.moderate')}</Badge>
                           ) : (
-                            <Badge className="bg-green-600">Normal</Badge>
+                            <Badge className="bg-green-600">{t('productionManagement.normal')}</Badge>
                           )}
                         </TableCell>
                       </TableRow>

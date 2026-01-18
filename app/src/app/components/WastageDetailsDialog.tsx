@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -12,6 +15,7 @@ interface WastageDetailsDialogProps {
 }
 
 export function WastageDetailsDialog({ open, onOpenChange, orders }: WastageDetailsDialogProps) {
+  const { t } = useTranslation();
   const totalWastageValue = orders.reduce((sum, order) => sum + order.totalWastageValue, 0);
   const totalMaterialCost = orders.reduce((sum, order) => 
     sum + order.rawMaterialsUsed.reduce((s, m) => s + m.cost, 0), 0

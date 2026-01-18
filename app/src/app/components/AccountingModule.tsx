@@ -1,3 +1,4 @@
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -8,12 +9,14 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { DollarSign, TrendingUp, TrendingDown, Wallet, Plus, ChevronRight, ChevronDown, Eye, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { mockChartOfAccounts, mockJournalEntries } from '../mockData';
 import { useState } from 'react';
 import React from 'react';
 import { toast } from 'sonner';
 
 export function AccountingModule() {
+  const { t } = useTranslation();
   const [expandedAccounts, setExpandedAccounts] = useState<string[]>(['COA-6000', 'COA-6100']);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [showNewEntry, setShowNewEntry] = useState(false);
@@ -37,7 +40,7 @@ export function AccountingModule() {
 
   const handleAddAccount = () => {
     if (!accountFormData.code || !accountFormData.name || !accountFormData.type) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -56,12 +59,12 @@ export function AccountingModule() {
     setAccounts([...accounts, newAccount]);
     setAccountFormData({ code: '', name: '', type: '', parentId: '' });
     setShowAddAccount(false);
-    toast.success('Account added successfully!');
+    toast.success(t('common.success'));
   };
 
   const handleNewEntry = () => {
     if (!entryFormData.date || !entryFormData.reference || !entryFormData.description || !entryFormData.debitAmount || !entryFormData.creditAmount) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -91,7 +94,7 @@ export function AccountingModule() {
       creditAmount: ''
     });
     setShowNewEntry(false);
-    toast.success('Journal entry created successfully!');
+    toast.success(t('messages.journalEntryCreatedSuccessfully'));
   };
 
   const toggleExpand = (accountId: string) => {

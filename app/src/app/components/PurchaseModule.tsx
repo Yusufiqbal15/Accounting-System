@@ -1,4 +1,6 @@
+'use client';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -13,6 +15,7 @@ import type { PaymentStatus, Purchase } from '../types';
 import { toast } from 'sonner';
 
 export function PurchaseModule() {
+  const { t } = useTranslation();
   const [showNewPurchase, setShowNewPurchase] = useState(false);
   const [purchases, setPurchases] = useState<Purchase[]>(mockPurchases);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,13 +38,13 @@ export function PurchaseModule() {
   const getPaymentBadge = (status: PaymentStatus) => {
     switch (status) {
       case 'paid':
-        return <Badge className="bg-green-600">Paid</Badge>;
+        return <Badge className="bg-green-600">{t('purchases.paid')}</Badge>;
       case 'partial':
-        return <Badge className="bg-amber-500">Partial</Badge>;
+        return <Badge className="bg-amber-500">{t('purchases.partial')}</Badge>;
       case 'pending':
-        return <Badge className="bg-orange-500">Pending</Badge>;
+        return <Badge className="bg-orange-500">{t('purchases.pending')}</Badge>;
       case 'overdue':
-        return <Badge className="bg-red-500">Overdue</Badge>;
+        return <Badge className="bg-red-500">{t('purchases.overdue')}</Badge>;
     }
   };
 
@@ -70,7 +73,7 @@ export function PurchaseModule() {
   const handleCreatePurchase = () => {
     // Validation
     if (!formData.supplier || !formData.item || !formData.quantity || !formData.basePrice) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -118,7 +121,7 @@ export function PurchaseModule() {
     });
     setShowNewPurchase(false);
     
-    toast.success('Purchase order created successfully!');
+    toast.success(t('purchases.orderCreatedSuccessfully'));
   };
 
   // Filter purchases
@@ -132,7 +135,7 @@ export function PurchaseModule() {
 
   const handleDeletePurchase = (id: string) => {
     setPurchases(purchases.filter(p => p.id !== id));
-    toast.success('Purchase order deleted successfully!');
+    toast.success(t('common.success'));
   };
 
   return (
@@ -140,35 +143,35 @@ export function PurchaseModule() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Purchase Module</h1>
-          <p className="text-muted-foreground mt-1">Manage purchases with landed cost calculation</p>
+          <h1 className="text-3xl font-semibold">{t('purchases.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('purchases.title')}</p>
         </div>
         <Dialog open={showNewPurchase} onOpenChange={setShowNewPurchase}>
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              New Purchase
+              {t('purchases.newPurchase')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create New Purchase Order</DialogTitle>
+              <DialogTitle>{t('purchases.newPurchase')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-6 py-4">
               {/* Supplier Selection */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Supplier</Label>
+                  <Label>{t('purchases.supplier')}</Label>
                   <Input 
-                    placeholder="Enter supplier name"
+                    placeholder={t('purchases.supplier')}
                     value={formData.supplier}
                     onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Item Name</Label>
+                  <Label>{t('purchases.itemName')}</Label>
                   <Input 
-                    placeholder="Enter item name"
+                    placeholder={t('purchases.itemName')}
                     value={formData.item}
                     onChange={(e) => setFormData({ ...formData, item: e.target.value })}
                   />
@@ -177,7 +180,7 @@ export function PurchaseModule() {
 
               {/* Item Type */}
               <div>
-                <Label>Item Type</Label>
+                <Label>{t('itemsManagement.type')}</Label>
                 <Select value={formData.itemType} onValueChange={(val) => setFormData({ ...formData, itemType: val })}>
                   <SelectTrigger>
                     <SelectValue />
@@ -301,10 +304,10 @@ export function PurchaseModule() {
 
               {/* Pricing */}
               <div>
-                <Label className="mb-3 block">Pricing & Charges (AED)</Label>
+                <Label className="mb-3 block">{t('purchases.pricing')} (AED)</Label>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Base Purchase Price</Label>
+                    <Label className="text-xs text-muted-foreground">{t('purchases.basePrice')}</Label>
                     <Input 
                       type="number"
                       placeholder="20000"
@@ -313,7 +316,7 @@ export function PurchaseModule() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Shipping Cost</Label>
+                    <Label className="text-xs text-muted-foreground">{t('purchases.shippingCost')}</Label>
                     <Input 
                       type="number"
                       placeholder="1500"
@@ -322,7 +325,7 @@ export function PurchaseModule() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Customs / Clearance</Label>
+                    <Label className="text-xs text-muted-foreground">{t('purchases.customsClearance')}</Label>
                     <Input 
                       type="number"
                       placeholder="800"
@@ -331,7 +334,7 @@ export function PurchaseModule() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Other Charges</Label>
+                    <Label className="text-xs text-muted-foreground">{t('common.actions')}</Label>
                     <Input 
                       type="number"
                       placeholder="200"
@@ -345,19 +348,19 @@ export function PurchaseModule() {
               {/* Cost Summary */}
               <Card className="bg-green-50 border-green-200">
                 <CardHeader>
-                  <CardTitle className="text-sm">Cost Summary</CardTitle>
+                  <CardTitle className="text-sm">{t('common.success')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span>Landed Cost (Auto):</span>
+                    <span>{t('purchases.landedCost')} (Auto):</span>
                     <span className="font-semibold">AED {landedCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>VAT 5%:</span>
+                    <span>{t('purchases.vatAmount')}:</span>
                     <span className="font-semibold">AED {vatAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex justify-between text-base font-semibold pt-2 border-t border-green-300">
-                    <span>Total Cost:</span>
+                    <span>{t('purchases.totalCost')}:</span>
                     <span className="text-green-900">AED {totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 </CardContent>
@@ -366,10 +369,10 @@ export function PurchaseModule() {
               {/* Actions */}
               <div className="flex gap-3 justify-end">
                 <Button variant="outline" onClick={() => setShowNewPurchase(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleCreatePurchase}>
-                  Create Purchase Order
+                  {t('purchases.newPurchase')}
                 </Button>
               </div>
             </div>
@@ -380,7 +383,7 @@ export function PurchaseModule() {
       {/* Purchase History */}
       <Card>
         <CardHeader>
-          <CardTitle>Purchase History</CardTitle>
+          <CardTitle>{t('purchases.newPurchase')}</CardTitle>
         </CardHeader>
         <CardContent>
           {/* Search and Filter */}
@@ -390,7 +393,7 @@ export function PurchaseModule() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by supplier, item, or PO ID..."
+                    placeholder={t('common.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -399,14 +402,14 @@ export function PurchaseModule() {
               </div>
               <Select value={filterStatus} onValueChange={(val: any) => setFilterStatus(val)}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder={t('common.filter')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="partial">Partial</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="all">{t('itemsManagement.all')}</SelectItem>
+                  <SelectItem value="paid">{t('purchases.paid')}</SelectItem>
+                  <SelectItem value="partial">{t('purchases.partial')}</SelectItem>
+                  <SelectItem value="pending">{t('purchases.pending')}</SelectItem>
+                  <SelectItem value="overdue">{t('purchases.overdue')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -415,16 +418,16 @@ export function PurchaseModule() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>PO ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Supplier</TableHead>
-                <TableHead>Item</TableHead>
-                <TableHead className="text-right">Volume (m³)</TableHead>
-                <TableHead className="text-right">Landed Cost</TableHead>
+                <TableHead>{t('purchases.poNumber')}</TableHead>
+                <TableHead>{t('production.orderDate')}</TableHead>
+                <TableHead>{t('purchases.supplier')}</TableHead>
+                <TableHead>{t('purchases.itemName')}</TableHead>
+                <TableHead className="text-right">{t('inventory.volume')} (m³)</TableHead>
+                <TableHead className="text-right">{t('purchases.landedCost')}</TableHead>
                 <TableHead className="text-right">VAT (5%)</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead>Payment Status</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead className="text-right">{t('purchases.totalCost')}</TableHead>
+                <TableHead>{t('purchases.paymentStatus')}</TableHead>
+                <TableHead>{t('common.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -455,7 +458,7 @@ export function PurchaseModule() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
-                    No purchase orders found
+                    {t('common.noData')}
                   </TableCell>
                 </TableRow>
               )}

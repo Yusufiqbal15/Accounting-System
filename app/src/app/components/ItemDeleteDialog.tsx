@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { useState } from 'react';
 import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
@@ -11,6 +14,7 @@ interface ItemDeleteDialogProps {
 }
 
 export function ItemDeleteDialog({ open, onOpenChange, item }: ItemDeleteDialogProps) {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -24,7 +28,7 @@ export function ItemDeleteDialog({ open, onOpenChange, item }: ItemDeleteDialogP
     setShowSuccess(true);
 
     // Show success message
-    toast.success('Item deleted successfully!');
+    toast.success(t('messages.itemDeletedSuccessfully'));
 
     // Close dialog after showing success
     setTimeout(() => {

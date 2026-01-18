@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
@@ -5,6 +8,7 @@ import { Printer, Download, Mail } from 'lucide-react';
 import { mockSales } from '../mockData';
 
 export function InvoicePreview() {
+  const { t } = useTranslation();
   const invoice = mockSales[0]; // Using first sale as example
   const invoiceDate = new Date(invoice.date);
 

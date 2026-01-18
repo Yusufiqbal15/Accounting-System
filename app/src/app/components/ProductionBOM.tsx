@@ -1,4 +1,6 @@
-import { useState } from 'react';
+'use client';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Button } from './ui/button';
@@ -11,8 +13,13 @@ import type { BOM } from '../types';
 import { toast } from 'sonner';
 
 export function ProductionBOM() {
+  const { t, i18n } = useTranslation();
   const [boms, setBOMs] = useState<BOM[]>(mockBOMs);
   const [showAddBOM, setShowAddBOM] = useState(false);
+
+  React.useEffect(() => {
+    // Force re-render when language changes
+  }, [i18n.language]);
   const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     productName: '',
@@ -22,7 +29,7 @@ export function ProductionBOM() {
 
   const handleAddBOM = () => {
     if (!formData.productName || !formData.laborCost || !formData.overheadCost) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -39,7 +46,7 @@ export function ProductionBOM() {
     setBOMs([...boms, newBOM]);
     setFormData({ productName: '', laborCost: '', overheadCost: '' });
     setShowAddBOM(false);
-    toast.success('BOM created successfully!');
+    toast.success(t('messages.bomCreatedSuccessfully'));
   };
 
   const filteredBOMs = boms.filter(bom => 
@@ -52,23 +59,23 @@ export function ProductionBOM() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Production & BOM</h1>
-          <p className="text-muted-foreground mt-1">Bill of Materials with cost breakdown</p>
+          <h1 className="text-3xl font-semibold">{t('production.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('production.billOfMaterials')}</p>
         </div>
         <Dialog open={showAddBOM} onOpenChange={setShowAddBOM}>
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              Create New BOM
+              {t('production.createNewBOM')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Bill of Materials</DialogTitle>
+              <DialogTitle>{t('production.createNewBOM')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Product Name *</Label>
+                <Label>{t('production.productName')} *</Label>
                 <Input
                   placeholder="Enter product name"
                   value={formData.productName}
@@ -77,7 +84,7 @@ export function ProductionBOM() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Labor Cost (AED) *</Label>
+                  <Label>{t('production.laborCost')} *</Label>
                   <Input
                     type="number"
                     placeholder="Enter labor cost"
@@ -86,7 +93,7 @@ export function ProductionBOM() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Overhead Cost (AED) *</Label>
+                  <Label>{t('production.overheadCost')} *</Label>
                   <Input
                     type="number"
                     placeholder="Enter overhead cost"
@@ -110,7 +117,7 @@ export function ProductionBOM() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by product name or BOM ID..."
+              placeholder={t('production.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -127,13 +134,13 @@ export function ProductionBOM() {
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle>{bom.productName}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">BOM ID: {bom.id}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('production.bomId')}: {bom.id}</p>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-semibold text-blue-900">
                     AED {bom.totalProductionCost.toLocaleString()}
                   </div>
-                  <p className="text-xs text-muted-foreground">Total Production Cost</p>
+                  <p className="text-xs text-muted-foreground">{t('production.totalProductionCost')}</p>
                 </div>
               </div>
             </CardHeader>
@@ -142,16 +149,16 @@ export function ProductionBOM() {
               <div>
                 <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                   <Package className="h-4 w-4" />
-                  Raw Materials Used
+                  {t('production.rawMaterialsUsed')}
                 </h3>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Item Code</TableHead>
-                      <TableHead>Item Name</TableHead>
-                      <TableHead className="text-right">Quantity</TableHead>
-                      <TableHead className="text-right">Volume (m³)</TableHead>
-                      <TableHead className="text-right">Cost (AED)</TableHead>
+                      <TableHead>{t('production.itemCode')}</TableHead>
+                      <TableHead>{t('production.itemName')}</TableHead>
+                      <TableHead className="text-right">{t('production.quantity')}</TableHead>
+                      <TableHead className="text-right">{t('production.volume')}</TableHead>
+                      <TableHead className="text-right">{t('production.cost')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -165,7 +172,7 @@ export function ProductionBOM() {
                       </TableRow>
                     ))}
                     <TableRow className="bg-muted/50">
-                      <TableCell colSpan={4} className="font-semibold">Material Cost Total</TableCell>
+                      <TableCell colSpan={4} className="font-semibold">{t('production.materialCostTotal')}</TableCell>
                       <TableCell className="text-right font-semibold">
                         AED {bom.rawMaterials.reduce((sum, m) => sum + m.cost, 0).toLocaleString()}
                       </TableCell>
@@ -183,7 +190,7 @@ export function ProductionBOM() {
                         <Package className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Material Cost</p>
+                        <p className="text-xs text-muted-foreground">{t('production.materialCost')}</p>
                         <p className="text-lg font-semibold">
                           AED {bom.rawMaterials.reduce((sum, m) => sum + m.cost, 0).toLocaleString()}
                         </p>
@@ -199,7 +206,7 @@ export function ProductionBOM() {
                         <Users className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Labor Cost</p>
+                        <p className="text-xs text-muted-foreground">{t('production.laborCost')}</p>
                         <p className="text-lg font-semibold">AED {bom.laborCost.toLocaleString()}</p>
                       </div>
                     </div>
@@ -213,7 +220,7 @@ export function ProductionBOM() {
                         <Zap className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Overhead Cost</p>
+                        <p className="text-xs text-muted-foreground">{t('production.overheadCost')}</p>
                         <p className="text-lg font-semibold">AED {bom.overheadCost.toLocaleString()}</p>
                       </div>
                     </div>
@@ -223,7 +230,7 @@ export function ProductionBOM() {
                 <Card className="bg-blue-900 text-white">
                   <CardContent className="pt-6">
                     <div>
-                      <p className="text-xs opacity-80">Final Cost per Unit</p>
+                      <p className="text-xs opacity-80">{t('production.finalCostPerUnit')}</p>
                       <p className="text-xl font-semibold mt-1">AED {bom.costPerUnit.toLocaleString()}</p>
                     </div>
                   </CardContent>
@@ -234,7 +241,7 @@ export function ProductionBOM() {
         )) : (
           <Card>
             <CardContent className="pt-6 text-center py-8 text-muted-foreground">
-              No BOMs found matching your search
+              {t('common.noData')}
             </CardContent>
           </Card>
         )}

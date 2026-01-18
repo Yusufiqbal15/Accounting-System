@@ -1,3 +1,5 @@
+'use client';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -18,6 +20,7 @@ import { useState } from 'react';
 import { WastageDetailsDialog } from './WastageDetailsDialog';
 
 export function FinancialReports() {
+  const { t } = useTranslation();
   const [wastageDialogOpen, setWastageDialogOpen] = useState(false);
   const [selectedWastageOrders, setSelectedWastageOrders] = useState<typeof mockProductionOrders>([]);
 

@@ -1,4 +1,6 @@
+'use client';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -13,6 +15,7 @@ import { Label } from './ui/label';
 import { toast } from 'sonner';
 
 export function RepairMaintenance() {
+  const { t } = useTranslation();
   const [repairs, setRepairs] = useState<RepairService[]>(mockRepairs);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<PaymentStatus | 'all'>('all');
@@ -27,7 +30,7 @@ export function RepairMaintenance() {
 
   const handleAddRepair = () => {
     if (!formData.customerName || !formData.instrument || !formData.issueDescription || !formData.laborCharges || !formData.technicianAssigned) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -56,19 +59,19 @@ export function RepairMaintenance() {
     setRepairs([...repairs, newRepair]);
     setFormData({ customerName: '', instrument: '', issueDescription: '', laborCharges: '', technicianAssigned: '' });
     setShowAddRepair(false);
-    toast.success('Repair service added successfully!');
+    toast.success(t('repairs.title'));
   };
 
   const getPaymentBadge = (status: PaymentStatus) => {
     switch (status) {
       case 'paid':
-        return <Badge className="bg-green-600">Paid</Badge>;
+        return <Badge className="bg-green-600">{t('purchases.paid')}</Badge>;
       case 'partial':
-        return <Badge className="bg-amber-500">Partial</Badge>;
+        return <Badge className="bg-amber-500">{t('purchases.partial')}</Badge>;
       case 'pending':
-        return <Badge className="bg-orange-500">Pending</Badge>;
+        return <Badge className="bg-orange-500">{t('purchases.pending')}</Badge>;
       case 'overdue':
-        return <Badge className="bg-red-500">Overdue</Badge>;
+        return <Badge className="bg-red-500">{t('purchases.overdue')}</Badge>;
     }
   };
 

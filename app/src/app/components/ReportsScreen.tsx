@@ -1,3 +1,5 @@
+'use client';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -6,22 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 
 export function ReportsScreen() {
+  const { t } = useTranslation();
   return (
     <div className="p-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold">Reports</h1>
-        <p className="text-muted-foreground mt-1">Generate comprehensive business reports</p>
+        <h1 className="text-3xl font-semibold">{t('reports.title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('reports.title')}</p>
       </div>
 
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Report Filters</CardTitle>
+          <CardTitle>{t('common.filter')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <Label>Report Type</Label>
+              <Label>{t('reports.reportType')}</Label>
               <Select>
                 <SelectTrigger>
                   <SelectValue placeholder="Select report" />

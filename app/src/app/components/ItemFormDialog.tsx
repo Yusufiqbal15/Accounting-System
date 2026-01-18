@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -16,6 +19,7 @@ interface ItemFormDialogProps {
 }
 
 export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemFormDialogProps) {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -69,7 +73,7 @@ export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemForm
     setShowSuccess(true);
 
     // Show success message
-    toast.success(isEditing ? 'Item updated successfully!' : 'Item created successfully!');
+    toast.success(isEditing ? t('messages.itemUpdatedSuccessfully') : t('messages.itemCreatedSuccessfully'));
 
     // Hide success state and close dialog after delay
     setTimeout(() => {

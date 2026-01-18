@@ -1,4 +1,6 @@
-import { useState } from 'react';
+'use client';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -18,11 +20,16 @@ interface SalesModuleProps {
 }
 
 export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
+  const { t, i18n } = useTranslation();
   const [sales, setSales] = useState<Sale[]>(mockSales);
   const [inventory, setInventory] = useState<InventoryItem[]>(mockInventory);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<PaymentStatus | 'all'>('all');
   const [filterType, setFilterType] = useState<'all' | 'sale' | 'repair' | 'return'>('all');
+
+  React.useEffect(() => {
+    // Force re-render when language changes
+  }, [i18n.language]);
   const [showAddSale, setShowAddSale] = useState(false);
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -87,7 +94,7 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
   // Handle adding a new customer
   const handleAddNewCustomer = () => {
     if (!newCustomerData.name || !newCustomerData.contact || !newCustomerData.email || !newCustomerData.phone || !newCustomerData.address) {
-      toast.error('Please fill in all fields');
+      toast.error(t('sales.enterCustomerDetails'));
       return;
     }
 
@@ -119,7 +126,7 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
       address: ''
     });
     setShowAddCustomer(false);
-    toast.success('New customer added successfully!');
+    toast.success(t('sales.customerAddedSuccessfully'));
   };
 
   // Handle item selection from dropdown
@@ -143,13 +150,13 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
   const handleAddSale = () => {
     // Validate required fields
     if (!formData.customerId || !formData.itemId || !formData.quantity || !formData.ratePerUnit) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
     // For wood items, dimensions are mandatory
     if (formData.itemType === 'wood' && (!formData.length || !formData.width || !formData.height)) {
-      toast.error('Please provide dimensions for wood items');
+      toast.error(t('inventory.pleaseProvideDimensions'));
       return;
     }
 
@@ -157,11 +164,12 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
     if (formData.saleType === 'sale') {
       const inventoryItem = inventory.find(item => item.id === formData.itemId);
       if (!inventoryItem || inventoryItem.quantity < parseFloat(formData.quantity)) {
-        toast.error('Insufficient inventory quantity');
-        return;
+          toast.error(t('sales.selectValidCustomer'));
+          return;
+        }
       }
-    }
-
+    
+    // Calculate amount
     const amount = parseFloat(formData.quantity) * parseFloat(formData.ratePerUnit);
     const vat = amount * 0.05;
     const total = amount + vat;
@@ -258,19 +266,19 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
       saleType: 'sale' 
     });
     setShowAddSale(false);
-    toast.success('Transaction recorded and customer updated!');
+    toast.success(t('messages.transactionRecorded'));
   };
 
   const getPaymentBadge = (status: PaymentStatus) => {
     switch (status) {
       case 'paid':
-        return <Badge className="bg-green-600">Paid</Badge>;
+        return <Badge className="bg-green-600">{t('salesModule.paid')}</Badge>;
       case 'partial':
-        return <Badge className="bg-amber-500">Partial</Badge>;
+        return <Badge className="bg-amber-500">{t('salesModule.partial')}</Badge>;
       case 'pending':
-        return <Badge className="bg-orange-500">Pending</Badge>;
+        return <Badge className="bg-orange-500">{t('common.loading')}</Badge>;
       case 'overdue':
-        return <Badge className="bg-red-500">Overdue</Badge>;
+        return <Badge className="bg-red-500">{t('reports.overdue')}</Badge>;
     }
   };
 
@@ -288,39 +296,39 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Sales Module</h1>
-          <p className="text-muted-foreground mt-1">Manage sales and generate invoices</p>
+          <h1 className="text-3xl font-semibold">{t('salesModule.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('salesModule.manageSales')}</p>
         </div>
         <Dialog open={showAddSale} onOpenChange={setShowAddSale}>
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              New Sale
+              {t('salesModule.newSale')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Sale</DialogTitle>
+              <DialogTitle>{t('dialogs.addItem')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto">
               {/* Customer Selection with Search */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center mb-2">
-                  <Label>Select Customer * (CRM)</Label>
+                  <Label>{t('salesModule.customer')} * (CRM)</Label>
                   <Dialog open={showAddCustomer} onOpenChange={setShowAddCustomer}>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="outline" className="bg-amber-50 hover:bg-amber-100 text-amber-900">
                         <Plus className="h-3 w-3 mr-1" />
-                        Add Customer
+                        {t('customers.addCustomer')}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
-                        <DialogTitle>Add New Customer</DialogTitle>
+                        <DialogTitle>{t('customers.addCustomer')}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                          <Label>Customer Name *</Label>
+                          <Label>{t('customers.name')} *</Label>
                           <Input
                             placeholder="Enter customer name"
                             value={newCustomerData.name}
@@ -328,7 +336,7 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Contact Person Name *</Label>
+                          <Label>{t('customers.contact')} *</Label>
                           <Input
                             placeholder="Enter contact person name"
                             value={newCustomerData.contact}
@@ -336,7 +344,7 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Email *</Label>
+                          <Label>{t('customers.email')} *</Label>
                           <Input
                             type="email"
                             placeholder="Enter email"
@@ -345,7 +353,7 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Phone Number *</Label>
+                          <Label>{t('customers.phone')} *</Label>
                           <Input
                             placeholder="Enter phone number"
                             value={newCustomerData.phone}
@@ -353,7 +361,7 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Address *</Label>
+                          <Label>{t('customers.address')} *</Label>
                           <Input
                             placeholder="Enter address"
                             value={newCustomerData.address}
@@ -361,8 +369,8 @@ export function SalesModule({ customers, setCustomers }: SalesModuleProps) {
                           />
                         </div>
                         <div className="flex gap-3 justify-end pt-4">
-                          <Button variant="outline" onClick={() => setShowAddCustomer(false)}>Cancel</Button>
-                          <Button className="bg-amber-600 hover:bg-amber-700" onClick={handleAddNewCustomer}>Add Customer</Button>
+                          <Button variant="outline" onClick={() => setShowAddCustomer(false)}>{t('common.cancel')}</Button>
+                          <Button className="bg-amber-600 hover:bg-amber-700" onClick={handleAddNewCustomer}>{t('customers.addCustomer')}</Button>
                         </div>
                       </div>
                     </DialogContent>

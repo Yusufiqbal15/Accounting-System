@@ -1,4 +1,7 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { LoginScreen } from './components/LoginScreen';
 import { Sidebar, type NavigationPage } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
@@ -21,10 +24,22 @@ import { Toaster } from './components/ui/sonner';
 import { mockCustomers } from './mockData';
 import type { Customer } from './types';
 
-export default function App() {
+function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('dashboard');
   const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const { isArabic } = useLanguage();
+
+  useEffect(() => {
+    setIsHydrated(true);
+    document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+  }, [isArabic]);
+
+  // Don't render until hydrated to prevent mismatch
+  if (!isHydrated) {
+    return null;
+  }
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
@@ -70,7 +85,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden" suppressHydrationWarning>
       <Sidebar
         currentPage={currentPage}
         onNavigate={setCurrentPage}
@@ -83,3 +98,5 @@ export default function App() {
     </div>
   );
 }
+
+export default AppContent;

@@ -1,4 +1,6 @@
+'use client';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
@@ -17,6 +19,7 @@ interface CustomerManagementProps {
 }
 
 export function CustomerManagement({ customers, setCustomers }: CustomerManagementProps) {
+  const { t } = useTranslation();
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'outstanding' | 'clear'>('all');
@@ -30,7 +33,7 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
 
   const handleAddCustomer = () => {
     if (!formData.name || !formData.email || !formData.phone) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('accounting.fillAllFields'));
       return;
     }
 
@@ -49,12 +52,12 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
     setCustomers([...customers, newCustomer]);
     setFormData({ name: '', contact: '', email: '', phone: '', address: '' });
     setShowAddCustomer(false);
-    toast.success('Customer added successfully!');
+    toast.success(t('customers.customerAddedSuccessfully'));
   };
 
   const handleDeleteCustomer = (id: string) => {
     setCustomers(customers.filter(c => c.id !== id));
-    toast.success('Customer deleted successfully!');
+    toast.success(t('customers.customerDeletedSuccessfully'));
   };
 
   // Filter customers
@@ -72,8 +75,8 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold">Customer Management (CRM)</h1>
-          <p className="text-muted-foreground mt-1">Manage customer relationships and transactions</p>
+          <h1 className="text-3xl font-semibold">{t('customers.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('customers.title')}</p>
         </div>
         <Dialog open={showAddCustomer} onOpenChange={setShowAddCustomer}>
           <DialogTrigger asChild>
