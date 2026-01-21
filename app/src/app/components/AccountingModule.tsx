@@ -130,7 +130,7 @@ export function AccountingModule() {
               <span className={account.level === 1 ? 'font-bold' : account.level === 2 ? 'font-semibold' : ''}>
                 {account.name}
                 {account.id === 'COA-6110' && (
-                  <Badge variant="destructive" className="ml-2 text-xs">Waste Account</Badge>
+                  <Badge variant="destructive" className="ml-2 text-xs">{t('accountingModule.wasteAccount')}</Badge>
                 )}
               </span>
             </div>
@@ -153,7 +153,7 @@ export function AccountingModule() {
           </TableCell>
           <TableCell className="text-center">
             <Badge variant={account.isActive ? 'default' : 'secondary'}>
-              {account.isActive ? 'Active' : 'Inactive'}
+              {account.isActive ? t('accountingModule.active') : t('dialogs.no')}
             </Badge>
           </TableCell>
         </TableRow>
@@ -184,15 +184,15 @@ export function AccountingModule() {
   return (
     <div className="p-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold">Accounting Module</h1>
-        <p className="text-muted-foreground mt-1">Financial management and Chart of Accounts</p>
+        <h1 className="text-3xl font-semibold">{t('accountingModule.title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('accountingModule.subtitle')}</p>
       </div>
 
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-green-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Total Revenue</CardTitle>
+            <CardTitle className="text-sm">{t('accountingModule.totalRevenue')}</CardTitle>
             <TrendingUp className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -201,19 +201,19 @@ export function AccountingModule() {
         </Card>
         <Card className="border-l-4 border-l-red-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Total Expenses</CardTitle>
+            <CardTitle className="text-sm">{t('accountingModule.totalExpenses')}</CardTitle>
             <TrendingDown className="h-5 w-5 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold text-red-500">AED {totalExpenses.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Waste: AED {productionWaste.toLocaleString()}
+              {t('accountingModule.waste')}: AED {productionWaste.toLocaleString()}
             </p>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-blue-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Cash Balance</CardTitle>
+            <CardTitle className="text-sm">{t('accountingModule.cashBalance')}</CardTitle>
             <Wallet className="h-5 w-5 text-blue-900" />
           </CardHeader>
           <CardContent>
@@ -222,7 +222,7 @@ export function AccountingModule() {
         </Card>
         <Card className="border-l-4 border-l-green-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Net Profit</CardTitle>
+            <CardTitle className="text-sm">{t('accountingModule.netProfit')}</CardTitle>
             <DollarSign className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -233,15 +233,15 @@ export function AccountingModule() {
 
       <Tabs defaultValue="coa">
         <TabsList>
-          <TabsTrigger value="coa">Chart of Accounts</TabsTrigger>
-          <TabsTrigger value="journal">Journal Entries</TabsTrigger>
+          <TabsTrigger value="coa">{t('accountingModule.chartOfAccounts')}</TabsTrigger>
+          <TabsTrigger value="journal">{t('accountingModule.journalEntries')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="coa" className="mt-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Chart of Accounts</CardTitle>
+                <CardTitle>{t('accountingModule.chartOfAccounts')}</CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">
                   Complete account hierarchy with Production Waste/Scrap tracking
                 </p>
@@ -250,12 +250,12 @@ export function AccountingModule() {
                 <DialogTrigger asChild>
                   <Button className="bg-blue-900 hover:bg-blue-800">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Account
+                    {t('accountingModule.addAccount')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>Add New Account</DialogTitle>
+                    <DialogTitle>{t('accountingModule.addAccount')}</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -310,7 +310,7 @@ export function AccountingModule() {
                       </div>
                     </div>
                     <Button onClick={handleAddAccount} className="w-full bg-blue-600 hover:bg-blue-700">
-                      Create Account
+                      {t('accountingModule.addAccount')}
                     </Button>
                   </div>
                 </DialogContent>
@@ -427,7 +427,7 @@ export function AccountingModule() {
                       </div>
                     </div>
                     <Button onClick={handleNewEntry} className="w-full bg-blue-600 hover:bg-blue-700">
-                      Create Entry
+                      {t('accounting.addEntry')}
                     </Button>
                   </div>
                 </DialogContent>

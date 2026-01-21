@@ -98,9 +98,9 @@ export function ProductionOrderDialog({ open, onOpenChange }: ProductionOrderDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Production Order</DialogTitle>
+          <DialogTitle>{t('productionManagement.newProductionOrder')}</DialogTitle>
           <DialogDescription>
-            Enter production details with material wastage tracking
+            {t('productionManagement.subtitle')}
           </DialogDescription>
         </DialogHeader>
 
@@ -285,10 +285,10 @@ export function ProductionOrderDialog({ open, onOpenChange }: ProductionOrderDia
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating Order...
+                    {t('productionManagement.newProductionOrder')}
                   </>
                 ) : (
-                  'Create Production Order'
+                  t('productionManagement.newProductionOrder')
                 )}
               </Button>
             </div>

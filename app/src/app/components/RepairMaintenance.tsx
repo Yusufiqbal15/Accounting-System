@@ -96,12 +96,12 @@ export function RepairMaintenance() {
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              New Service Request
+              {t('repairs.newServiceRequest')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Service Request</DialogTitle>
+              <DialogTitle>{t('repairs.newServiceRequest')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -156,7 +156,7 @@ export function RepairMaintenance() {
                 </div>
               </div>
               <Button onClick={handleAddRepair} className="w-full bg-blue-600 hover:bg-blue-700">
-                Create Service Request
+                {t('repairs.newServiceRequest')}
               </Button>
             </div>
           </DialogContent>

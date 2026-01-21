@@ -45,8 +45,8 @@ export function ItemDeleteDialog({ open, onOpenChange, item }: ItemDeleteDialogP
         {showSuccess ? (
           <div className="flex flex-col items-center justify-center py-8">
             <CheckCircle2 className="h-16 w-16 text-green-600 mb-4" />
-            <h3 className="text-xl font-semibold text-green-600">Item Deleted!</h3>
-            <p className="text-muted-foreground mt-2">Item has been removed from inventory</p>
+            <h3 className="text-xl font-semibold text-green-600">{t('messages.itemDeletedSuccessfully')}</h3>
+            <p className="text-muted-foreground mt-2">{t('messages.itemDeletedSuccessfully')}</p>
           </div>
         ) : (
           <>
@@ -56,9 +56,9 @@ export function ItemDeleteDialog({ open, onOpenChange, item }: ItemDeleteDialogP
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <AlertDialogTitle>Delete Item</AlertDialogTitle>
+                  <AlertDialogTitle>{t('itemsManagement.deleteItem')}</AlertDialogTitle>
                   <AlertDialogDescription className="mt-1">
-                    This action cannot be undone
+                    {t('dialogs.deleteMessage')}
                   </AlertDialogDescription>
                 </div>
               </div>
@@ -83,7 +83,7 @@ export function ItemDeleteDialog({ open, onOpenChange, item }: ItemDeleteDialogP
             </div>
 
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeleting}>{t('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={(e) => {
                   e.preventDefault();
@@ -95,10 +95,10 @@ export function ItemDeleteDialog({ open, onOpenChange, item }: ItemDeleteDialogP
                 {isDeleting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Deleting...
+                    {t('itemsManagement.deleteItem')}
                   </>
                 ) : (
-                  'Delete Item'
+                  t('itemsManagement.deleteItem')
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>

@@ -82,12 +82,12 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              Add New Customer
+              {t('customersModule.addNewCustomer')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Customer</DialogTitle>
+              <DialogTitle>{t('customersModule.addNewCustomer')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -134,8 +134,8 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
                 />
               </div>
               <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowAddCustomer(false)}>Cancel</Button>
-                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddCustomer}>Add Customer</Button>
+                <Button variant="outline" onClick={() => setShowAddCustomer(false)}>{t('common.cancel')}</Button>
+                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddCustomer}>{t('customers.addCustomer')}</Button>
               </div>
             </div>
           </DialogContent>
@@ -146,7 +146,7 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-blue-900">
           <CardHeader>
-            <CardTitle className="text-sm">Total Customers</CardTitle>
+            <CardTitle className="text-sm">{t('customersModule.totalCustomers')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{customers.length}</div>
@@ -154,7 +154,7 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
         </Card>
         <Card className="border-l-4 border-l-green-600">
           <CardHeader>
-            <CardTitle className="text-sm">Total Sales</CardTitle>
+            <CardTitle className="text-sm">{t('customersModule.totalSales')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold text-green-600">
@@ -275,9 +275,9 @@ export function CustomerManagement({ customers, setCustomers }: CustomerManageme
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <Button variant="outline" size="sm">View Transactions</Button>
-                <Button variant="outline" size="sm">Payment History</Button>
-                <Button variant="outline" size="sm">Edit Profile</Button>
+                <Button variant="outline" size="sm">{t('customersModule.viewTransactions')}</Button>
+                <Button variant="outline" size="sm">{t('customersModule.paymentHistory')}</Button>
+                <Button variant="outline" size="sm">{t('customersModule.editProfile')}</Button>
                 <Button
                   variant="ghost"
                   size="sm"

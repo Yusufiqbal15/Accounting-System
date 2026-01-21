@@ -102,12 +102,12 @@ export function WorkOrders() {
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              Create Work Order
+              {t('workOrders.createWorkOrder')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Work Order</DialogTitle>
+              <DialogTitle>{t('workOrders.createWorkOrder')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -146,8 +146,8 @@ export function WorkOrders() {
                 </div>
               </div>
               <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowAddWO(false)}>Cancel</Button>
-                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddWorkOrder}>Create Work Order</Button>
+                <Button variant="outline" onClick={() => setShowAddWO(false)}>{t('common.cancel')}</Button>
+                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddWorkOrder}>{t('workOrders.createWorkOrder')}</Button>
               </div>
             </div>
           </DialogContent>

@@ -77,12 +77,12 @@ export function SupplierManagement() {
           <DialogTrigger asChild>
             <Button className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" />
-              Add New Supplier
+              {t('suppliersModule.addNewSupplier')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Supplier</DialogTitle>
+              <DialogTitle>{t('suppliersModule.addNewSupplier')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
@@ -129,8 +129,8 @@ export function SupplierManagement() {
                 />
               </div>
               <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowAddSupplier(false)}>Cancel</Button>
-                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddSupplier}>Add Supplier</Button>
+                <Button variant="outline" onClick={() => setShowAddSupplier(false)}>{t('common.cancel')}</Button>
+                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddSupplier}>{t('suppliers.addSupplier')}</Button>
               </div>
             </div>
           </DialogContent>
@@ -141,7 +141,7 @@ export function SupplierManagement() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-l-4 border-l-blue-900">
           <CardHeader>
-            <CardTitle className="text-sm">Total Suppliers</CardTitle>
+            <CardTitle className="text-sm">{t('suppliersModule.totalSuppliers')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold">{suppliers.length}</div>
@@ -149,7 +149,7 @@ export function SupplierManagement() {
         </Card>
         <Card className="border-l-4 border-l-green-600">
           <CardHeader>
-            <CardTitle className="text-sm">Total Purchases</CardTitle>
+            <CardTitle className="text-sm">{t('suppliersModule.totalPurchases')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">

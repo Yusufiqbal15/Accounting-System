@@ -98,7 +98,7 @@ export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemForm
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Item' : 'Add New Item'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('itemsManagement.editItem') : t('itemsManagement.addItem')}</DialogTitle>
           <DialogDescription>
             {isEditing ? 'Update item information below' : 'Enter new item details below'}
           </DialogDescription>
@@ -108,7 +108,7 @@ export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemForm
           <div className="flex flex-col items-center justify-center py-12">
             <CheckCircle2 className="h-16 w-16 text-green-600 mb-4" />
             <h3 className="text-xl font-semibold text-green-600">
-              {isEditing ? 'Item Updated!' : 'Item Created!'}
+              {isEditing ? t('messages.itemUpdatedSuccessfully') : t('messages.itemCreatedSuccessfully')}
             </h3>
             <p className="text-muted-foreground mt-2">Operation completed successfully</p>
           </div>
@@ -268,7 +268,7 @@ export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemForm
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button 
                 type="submit" 
@@ -281,7 +281,7 @@ export function ItemFormDialog({ open, onOpenChange, item, isEditing }: ItemForm
                     {isEditing ? 'Updating...' : 'Creating...'}
                   </>
                 ) : (
-                  <>{isEditing ? 'Update Item' : 'Create Item'}</>
+                  <>{isEditing ? t('itemsManagement.editItem') : t('itemsManagement.addItem')}</>
                 )}
               </Button>
             </DialogFooter>

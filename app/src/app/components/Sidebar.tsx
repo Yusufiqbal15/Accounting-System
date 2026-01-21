@@ -16,7 +16,8 @@ import {
   Receipt,
   Settings,
   LogOut,
-  Globe
+  Globe,
+  CreditCard
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -29,6 +30,7 @@ export type NavigationPage =
   | 'items'
   | 'purchases' 
   | 'sales' 
+  | 'customer-payment'
   | 'production' 
   | 'production-mgmt'
   | 'work-orders'
@@ -53,6 +55,7 @@ const getNavItems = (t: any) => [
   { id: 'items' as NavigationPage, label: t('nav.items'), icon: Package },
   { id: 'purchases' as NavigationPage, label: t('nav.purchases'), icon: ShoppingCart },
   { id: 'sales' as NavigationPage, label: t('nav.sales'), icon: TrendingUp },
+  { id: 'customer-payment' as NavigationPage, label: t('nav.customerPayment'), icon: CreditCard },
   { id: 'production' as NavigationPage, label: t('nav.production'), icon: Factory },
   { id: 'production-mgmt' as NavigationPage, label: t('nav.productionMgmt'), icon: Factory },
   { id: 'work-orders' as NavigationPage, label: t('nav.workOrders'), icon: ClipboardList },

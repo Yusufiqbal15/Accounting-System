@@ -103,8 +103,8 @@ export function ProductionBOM() {
                 </div>
               </div>
               <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowAddBOM(false)}>Cancel</Button>
-                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddBOM}>Create BOM</Button>
+                <Button variant="outline" onClick={() => setShowAddBOM(false)}>{t('common.cancel')}</Button>
+                <Button className="bg-blue-900 hover:bg-blue-800" onClick={handleAddBOM}>{t('production.createNewBOM')}</Button>
               </div>
             </div>
           </DialogContent>

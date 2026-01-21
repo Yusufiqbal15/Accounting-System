@@ -9,6 +9,7 @@ import { InventoryManagement } from './components/InventoryManagement';
 import { ItemsManagement } from './components/ItemsManagement';
 import { PurchaseModule } from './components/PurchaseModule';
 import { SalesModule } from './components/SalesModule';
+import { CustomerPaymentModule } from './components/CustomerPaymentModuleAdvanced';
 import { ProductionBOM } from './components/ProductionBOM';
 import { ProductionManagement } from './components/ProductionManagement';
 import { WorkOrders } from './components/WorkOrders';
@@ -57,6 +58,8 @@ function AppContent() {
         return <PurchaseModule />;
       case 'sales':
         return <SalesModule customers={customers} setCustomers={setCustomers} />;
+      case 'customer-payment':
+        return <CustomerPaymentModule customers={customers} setCustomers={setCustomers} />;
       case 'production':
         return <ProductionBOM />;
       case 'production-mgmt':

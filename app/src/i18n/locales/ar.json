@@ -5,6 +5,7 @@
     "items": "إدارة العناصر",
     "purchases": "المشتريات",
     "sales": "المبيعات",
+    "customerPayment": "دفع العميل",
     "production": "فاتورة المواد",
     "productionMgmt": "إدارة الإنتاج",
     "workOrders": "أوامر العمل",
@@ -218,7 +219,36 @@
     "length": "الطول",
     "width": "العرض",
     "height": "الارتفاع",
-    "dimensions": "الأبعاد"
+    "dimensions": "الأبعاد",
+    "recordPayment": "تسجيل الدفع",
+    "recordPaymentDesc": "تسجيل دفعة من عميل",
+    "selectCustomer": "اختر العميل",
+    "amount": "المبلغ",
+    "paymentMethod": "طريقة الدفع",
+    "enterReference": "أدخل رقم المرجع",
+    "enterNotes": "أدخل ملاحظات",
+    "outstanding": "المعلق",
+    "totalSales": "إجمالي المبيعات",
+    "totalPaid": "الإجمالي المدفوع",
+    "lastPayment": "آخر دفعة",
+    "searchCustomer": "ابحث عن العميل...",
+    "allStatuses": "جميع الحالات",
+    "paymentHistory": "سجل الدفع",
+    "date": "التاريخ",
+    "method": "الطريقة",
+    "reference": "المرجع",
+    "notes": "ملاحظات",
+    "totalCustomers": "إجمالي العملاء",
+    "totalCollected": "الإجمالي المجمع",
+    "paymentCount": "عدد الدفعات المسجلة",
+    "description": "الوصف"
+  },
+  "payment": {
+    "cash": "نقدي",
+    "bank": "تحويل بنكي",
+    "check": "شيك",
+    "pos": "بطاقة/POS",
+    "credit": "ائتمان"
   },
   "customers": {
     "title": "إدارة العملاء",
@@ -686,7 +716,7 @@
     "ftaDescription": "هيئة الضرائب الاتحادية (FTA) - الإمارات العربية المتحدة"
   },
   "language": {
-    "english": "English",
+    "english": "الإنجليزية",
     "arabic": "العربية"
   },
   "messages": {
